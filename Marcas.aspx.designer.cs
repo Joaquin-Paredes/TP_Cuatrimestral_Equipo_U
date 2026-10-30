@@ -15,6 +15,24 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
     {
 
         /// <summary>
+        /// Control txtCodigoMarca.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtCodigoMarca;
+
+        /// <summary>
+        /// Control txtNombreMarca.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNombreMarca;
+
+        /// <summary>
         /// Control dgvMarcas.
         /// </summary>
         /// <remarks>

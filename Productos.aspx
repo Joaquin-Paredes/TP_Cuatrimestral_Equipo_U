@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="Productos" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Productos.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Productos" %>
+﻿<%@ Page Title="Productos" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Productos.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Productos" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -27,14 +26,12 @@
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Marca</label>
-                    <asp:TextBox ID="txtMarca" runat="server"
-                        CssClass="form-control" placeholder="Ingrese la marca"></asp:TextBox>
+                    <asp:DropDownList ID="ddlMarca" runat="server" CssClass="form-control"></asp:DropDownList>
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Categoría</label>
-                    <asp:TextBox ID="txtCategoria" runat="server"
-                        CssClass="form-control" placeholder="Ingrese la categoría"></asp:TextBox>
+                    <asp:DropDownList ID="ddlCategoria" runat="server" CssClass="form-control"></asp:DropDownList>
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -52,10 +49,10 @@
             </div>
 
             <div class="mt-2">
-                <button type="button" class="btn btn-primary">Agregar</button>
-                <button type="button" class="btn btn-warning">Modificar</button>
-                <button type="button" class="btn btn-danger">Eliminar</button>
-                <button type="button" class="btn btn-secondary">Limpiar</button>
+                <asp:Button ID="btnAgregar" runat="server" Text="Agregar" CssClass="btn btn-primary" OnClick="btnAgregar_Click" />
+                <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" OnClick="btnModificar_Click" />
+                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" />
+                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
             </div>
 
         </div>
@@ -65,10 +62,13 @@
         <asp:GridView ID="dgvProductos" runat="server"
             CssClass="table table-striped table-bordered"
             AutoGenerateColumns="False"
+            DataKeyNames="Codigo"
+            OnSelectedIndexChanged="dgvProductos_SelectedIndexChanged"
             ShowHeaderWhenEmpty="True"
             EmptyDataText="No hay productos para mostrar.">
 
             <Columns>
+                <asp:CommandField ShowSelectButton="True" SelectText="Seleccionar" HeaderText="Acción" />
                 <asp:BoundField DataField="Codigo" HeaderText="Código" />
                 <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
                 <asp:BoundField DataField="Marca" HeaderText="Marca" />

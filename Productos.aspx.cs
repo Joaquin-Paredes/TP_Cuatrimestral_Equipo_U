@@ -1,7 +1,9 @@
-﻿using System;
+﻿
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -9,6 +11,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Productos : System.Web.UI.Page
     {
+        
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -18,130 +21,320 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+        
         private void CargarDesplegables()
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
-            // Cargar Marcas
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("SELECT Id, Nombre FROM Marcas", conn);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                ddlMarca.DataSource = dt;
+             
+                SqlDataAdapter daMarcas = new SqlDataAdapter(
+                    "SELECT Id, Nombre FROM Marcas ORDER BY Nombre", conn);
+
+                DataTable dtMarcas = new DataTable();
+                daMarcas.Fill(dtMarcas);
+
+                ddlMarca.DataSource = dtMarcas;
                 ddlMarca.DataTextField = "Nombre";
                 ddlMarca.DataValueField = "Id";
                 ddlMarca.DataBind();
-            }
 
-            // Cargar Categorías
-            using (SqlConnection conn = new SqlConnection(connString))
-            {
-                SqlCommand cmd = new SqlCommand("SELECT Id, Nombre FROM Categorias", conn);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                ddlCategoria.DataSource = dt;
+                ddlMarca.Items.Insert(0, new ListItem("Seleccione una marca", "0"));
+
+                ddlFiltroMarca.DataSource = dtMarcas;
+                ddlFiltroMarca.DataTextField = "Nombre";
+                ddlFiltroMarca.DataValueField = "Id";
+                ddlFiltroMarca.DataBind();
+
+                ddlFiltroMarca.Items.Insert(0, new ListItem("Todas las marcas", "0"));
+
+                
+                SqlDataAdapter daCategorias = new SqlDataAdapter(
+                    "SELECT Id, Nombre FROM Categorias ORDER BY Nombre", conn);
+
+                DataTable dtCategorias = new DataTable();
+                daCategorias.Fill(dtCategorias);
+
+                ddlCategoria.DataSource = dtCategorias;
                 ddlCategoria.DataTextField = "Nombre";
                 ddlCategoria.DataValueField = "Id";
                 ddlCategoria.DataBind();
+
+                ddlCategoria.Items.Insert(0, new ListItem("Seleccione una categoría", "0"));
+
+                ddlFiltroCategoria.DataSource = dtCategorias;
+                ddlFiltroCategoria.DataTextField = "Nombre";
+                ddlFiltroCategoria.DataValueField = "Id";
+                ddlFiltroCategoria.DataBind();
+
+                ddlFiltroCategoria.Items.Insert(0, new ListItem("Todas las categorías", "0"));
             }
         }
+
 
         private void CargarGrilla()
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "SELECT P.Codigo, P.Nombre, M.Nombre AS Marca, C.Nombre AS Categoria, P.Precio, P.Stock " +
-                               "FROM Productos P " +
-                               "INNER JOIN Marcas M ON P.IdMarca = M.Id " +
-                               "INNER JOIN Categorias C ON P.IdCategoria = C.Id";
+                string query = @"
+                    SELECT
+                        P.Codigo,
+                        P.Nombre,
+                        M.Nombre AS Marca,
+                        C.Nombre AS Categoria,
+                        P.Precio,
+                        P.Stock,
+                        P.StockMinimo
+                    FROM Productos P
+                    INNER JOIN Marcas M ON P.IdMarca = M.Id
+                    INNER JOIN Categorias C ON P.IdCategoria = C.Id
+                    WHERE
+                        (@Texto = '' OR P.Codigo LIKE '%' + @Texto + '%'
+                        OR P.Nombre LIKE '%' + @Texto + '%')
+                        AND (@IdMarca = 0 OR P.IdMarca = @IdMarca)
+                        AND (@IdCategoria = 0 OR P.IdCategoria = @IdCategoria)
+                    ORDER BY P.Nombre";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
-                conn.Open();
-                dgvProductos.DataSource = cmd.ExecuteReader();
+
+                cmd.Parameters.Add("@Texto", SqlDbType.VarChar, 120).Value =
+                    txtBuscar.Text.Trim();
+
+                int idMarca = 0;
+                int.TryParse(ddlFiltroMarca.SelectedValue, out idMarca);
+
+                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
+
+                int idCategoria = 0;
+                int.TryParse(ddlFiltroCategoria.SelectedValue, out idCategoria);
+
+                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+
+                dgvProductos.DataSource = dt;
                 dgvProductos.DataBind();
             }
         }
 
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            OcultarDetalle();
+            CargarGrilla();
+        }
+
+
+        protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
+        {
+            txtBuscar.Text = "";
+
+            if (ddlFiltroMarca.Items.Count > 0)
+                ddlFiltroMarca.SelectedIndex = 0;
+
+            if (ddlFiltroCategoria.Items.Count > 0)
+                ddlFiltroCategoria.SelectedIndex = 0;
+
+            dgvProductos.SelectedIndex = -1;
+
+            OcultarDetalle();
+            CargarGrilla();
+        }
+
+  
         protected void dgvProductos_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (dgvProductos.SelectedDataKey == null)
+                return;
+
             string codigo = dgvProductos.SelectedDataKey.Value.ToString();
+
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "SELECT Codigo, Nombre, Precio, Stock, IdMarca, IdCategoria FROM Productos WHERE Codigo = @Codigo";
+                string query = @"
+                    SELECT
+                        P.Codigo,
+                        P.Nombre,
+                        M.Nombre AS Marca,
+                        C.Nombre AS Categoria,
+                        P.Precio,
+                        P.Stock,
+                        P.StockMinimo,
+                        P.IdMarca,
+                        P.IdCategoria
+                    FROM Productos P
+                    INNER JOIN Marcas M ON P.IdMarca = M.Id
+                    INNER JOIN Categorias C ON P.IdCategoria = C.Id
+                    WHERE P.Codigo = @Codigo";
+
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Codigo", codigo);
+                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value = codigo;
 
                 conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    txtCodigoProducto.Text = reader["Codigo"].ToString();
-                    txtCodigoProducto.ReadOnly = true; // Bloquear clave primaria para evitar modificaciones erróneas
+                    if (reader.Read())
+                    {
+                      
+                        txtCodigoProducto.Text = reader["Codigo"].ToString();
+                        txtCodigoProducto.ReadOnly = true;
 
-                    txtNombreProducto.Text = reader["Nombre"].ToString();
-                    txtPrecio.Text = reader["Precio"].ToString();
-                    txtStock.Text = reader["Stock"].ToString();
+                        txtNombreProducto.Text = reader["Nombre"].ToString();
+                        txtPrecio.Text = reader["Precio"].ToString();
+                        txtStock.Text = reader["Stock"].ToString();
+                        txtStockMinimo.Text = reader["StockMinimo"].ToString();
 
-                    ddlMarca.SelectedValue = reader["IdMarca"].ToString();
-                    ddlCategoria.SelectedValue = reader["IdCategoria"].ToString();
+                        string idMarca = reader["IdMarca"].ToString();
+                        string idCategoria = reader["IdCategoria"].ToString();
+
+                        if (ddlMarca.Items.FindByValue(idMarca) != null)
+                            ddlMarca.SelectedValue = idMarca;
+
+                        if (ddlCategoria.Items.FindByValue(idCategoria) != null)
+                            ddlCategoria.SelectedValue = idCategoria;
+
+                  
+                        lblDetalleCodigo.Text = reader["Codigo"].ToString();
+                        lblDetalleNombre.Text = reader["Nombre"].ToString();
+                        lblDetalleMarca.Text = reader["Marca"].ToString();
+                        lblDetalleCategoria.Text = reader["Categoria"].ToString();
+                        lblDetallePrecio.Text = reader["Precio"].ToString();
+                        lblDetalleStock.Text = reader["Stock"].ToString();
+                        lblDetalleStockMinimo.Text = reader["StockMinimo"].ToString();
+
+                        pnlDetalleProducto.Visible = true;
+                    }
                 }
-                reader.Close();
             }
+        }
+
+        private bool ValidarProducto(
+            out decimal precio,
+            out int stock,
+            out int stockMinimo,
+            out int idMarca,
+            out int idCategoria)
+        {
+            precio = 0;
+            stock = 0;
+            stockMinimo = 0;
+            idMarca = 0;
+            idCategoria = 0;
+
+            if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text) ||
+                string.IsNullOrWhiteSpace(txtNombreProducto.Text))
+            {
+                MostrarMensaje("Debe ingresar el código y el nombre del producto.");
+                return false;
+            }
+
+            if (!decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Number,
+                    CultureInfo.CurrentCulture, out precio) &&
+                !decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Number,
+                    CultureInfo.InvariantCulture, out precio))
+            {
+                MostrarMensaje("Ingrese un precio válido.");
+                return false;
+            }
+
+            if (precio < 0)
+            {
+                MostrarMensaje("El precio no puede ser negativo.");
+                return false;
+            }
+
+            if (!int.TryParse(txtStock.Text, out stock) || stock < 0)
+            {
+                MostrarMensaje("Ingrese una cantidad de stock válida.");
+                return false;
+            }
+
+            if (!int.TryParse(txtStockMinimo.Text, out stockMinimo) || stockMinimo < 0)
+            {
+                MostrarMensaje("Ingrese un stock mínimo válido.");
+                return false;
+            }
+
+            if (!int.TryParse(ddlMarca.SelectedValue, out idMarca) || idMarca <= 0)
+            {
+                MostrarMensaje("Seleccione una marca.");
+                return false;
+            }
+
+            if (!int.TryParse(ddlCategoria.SelectedValue, out idCategoria) || idCategoria <= 0)
+            {
+                MostrarMensaje("Seleccione una categoría.");
+                return false;
+            }
+
+            return true;
         }
 
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
-            // Validación: si el código está vacío, no ejecutamos la inserción
-            if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text))
-            {
+            decimal precio;
+            int stock;
+            int stockMinimo;
+            int idMarca;
+            int idCategoria;
+
+            if (!ValidarProducto(out precio, out stock, out stockMinimo, out idMarca, out idCategoria))
                 return;
-            }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "INSERT INTO Productos (Codigo, Nombre, Precio, Stock, IdMarca, IdCategoria) " +
-                               "VALUES (@Codigo, @Nombre, @Precio, @Stock, @IdMarca, @IdCategoria)";
+                string query = @"
+                    INSERT INTO Productos
+                    (Codigo, Nombre, Precio, Stock, StockMinimo, IdMarca, IdCategoria)
+                    VALUES
+                    (@Codigo, @Nombre, @Precio, @Stock, @StockMinimo, @IdMarca, @IdCategoria)";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Codigo", txtCodigoProducto.Text);
-                cmd.Parameters.AddWithValue("@Nombre", txtNombreProducto.Text);
 
-                // Parseo seguro de Precio y Stock
-                decimal precio = 0;
-                decimal.TryParse(txtPrecio.Text.Replace('.', ','), out precio);
-                cmd.Parameters.AddWithValue("@Precio", precio);
+                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
+                    txtCodigoProducto.Text.Trim();
 
-                int stock = 0;
-                int.TryParse(txtStock.Text, out stock);
-                cmd.Parameters.AddWithValue("@Stock", stock);
+                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 100).Value =
+                    txtNombreProducto.Text.Trim();
 
-                cmd.Parameters.AddWithValue("@IdMarca", int.Parse(ddlMarca.SelectedValue));
-                cmd.Parameters.AddWithValue("@IdCategoria", int.Parse(ddlCategoria.SelectedValue));
+                cmd.Parameters.Add("@Precio", SqlDbType.Decimal).Value = precio;
+                cmd.Parameters["@Precio"].Precision = 18;
+                cmd.Parameters["@Precio"].Scale = 2;
+
+                cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = stock;
+                cmd.Parameters.Add("@StockMinimo", SqlDbType.Int).Value = stockMinimo;
+                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
+                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
 
                 try
                 {
                     conn.Open();
                     cmd.ExecuteNonQuery();
 
-                    CargarGrilla();
+                    MostrarMensaje("Producto agregado correctamente.");
+
                     LimpiarControles();
+                    CargarGrilla();
                 }
                 catch (SqlException ex)
                 {
-                    if (ex.Number == 2627 || ex.Number == 2601 || ex.Message.Contains("PRIMARY KEY"))
+                    if (ex.Number == 2627 || ex.Number == 2601)
                     {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "duplicado", "alert('Atención: Ya existe un producto registrado con el código ingresado.');", true);
+                        MostrarMensaje("Ya existe un producto registrado con ese código.");
                     }
                     else
                     {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "errorSQL", $"alert('Ocurrió un error en la base de datos: {ex.Message.Replace("'", "")}');", true);
+                        MostrarMensaje("Ocurrió un error al agregar el producto.");
                     }
                 }
             }
@@ -149,47 +342,99 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
         protected void btnModificar_Click(object sender, EventArgs e)
         {
+            decimal precio;
+            int stock;
+            int stockMinimo;
+            int idMarca;
+            int idCategoria;
+
+            if (!ValidarProducto(out precio, out stock, out stockMinimo, out idMarca, out idCategoria))
+                return;
+
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "UPDATE Productos SET Nombre = @Nombre, Precio = @Precio, Stock = @Stock, IdMarca = @IdMarca, IdCategoria = @IdCategoria " +
-                               "WHERE Codigo = @Codigo";
+                string query = @"
+                    UPDATE Productos
+                    SET Nombre = @Nombre,
+                        Precio = @Precio,
+                        Stock = @Stock,
+                        StockMinimo = @StockMinimo,
+                        IdMarca = @IdMarca,
+                        IdCategoria = @IdCategoria
+                    WHERE Codigo = @Codigo";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Codigo", txtCodigoProducto.Text);
-                cmd.Parameters.AddWithValue("@Nombre", txtNombreProducto.Text);
+               
+                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
+                    txtCodigoProducto.Text.Trim();
 
-                // Parseo seguro de Precio y Stock
-                decimal precio = 0;
-                decimal.TryParse(txtPrecio.Text.Replace('.', ','), out precio);
-                cmd.Parameters.AddWithValue("@Precio", precio);
+                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 100).Value =
+                    txtNombreProducto.Text.Trim();
 
-                int stock = 0;
-                int.TryParse(txtStock.Text, out stock);
-                cmd.Parameters.AddWithValue("@Stock", stock);
+                cmd.Parameters.Add("@Precio", SqlDbType.Decimal).Value = precio;
+                cmd.Parameters["@Precio"].Precision = 18;
+                cmd.Parameters["@Precio"].Scale = 2;
 
-                cmd.Parameters.AddWithValue("@IdMarca", int.Parse(ddlMarca.SelectedValue));
-                cmd.Parameters.AddWithValue("@IdCategoria", int.Parse(ddlCategoria.SelectedValue));
+                cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = stock;
+                cmd.Parameters.Add("@StockMinimo", SqlDbType.Int).Value = stockMinimo;
+                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
+                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
 
                 conn.Open();
-                cmd.ExecuteNonQuery();
+
+                int filas = cmd.ExecuteNonQuery();
+
+                if (filas > 0)
+                {
+                    MostrarMensaje("Producto modificado correctamente.");
+
+                    LimpiarControles();
+                    CargarGrilla();
+                }
+                else
+                {
+                    MostrarMensaje("No se encontró el producto que desea modificar.");
+                }
             }
-            CargarGrilla();
-            LimpiarControles();
         }
 
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text))
+            {
+                MostrarMensaje("Seleccione un producto para eliminar.");
+                return;
+            }
+
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM Productos WHERE Codigo = @Codigo", conn);
-                cmd.Parameters.AddWithValue("@Codigo", txtCodigoProducto.Text);
+                string query = "DELETE FROM Productos WHERE Codigo = @Codigo";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+
+                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
+                    txtCodigoProducto.Text.Trim();
+
                 conn.Open();
-                cmd.ExecuteNonQuery();
+
+                int filas = cmd.ExecuteNonQuery();
+
+                if (filas > 0)
+                {
+                    MostrarMensaje("Producto eliminado correctamente.");
+
+                    LimpiarControles();
+                    CargarGrilla();
+                }
+                else
+                {
+                    MostrarMensaje("No se encontró el producto que desea eliminar.");
+                }
             }
-            CargarGrilla();
-            LimpiarControles();
         }
 
         protected void btnLimpiar_Click(object sender, EventArgs e)
@@ -200,12 +445,43 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         private void LimpiarControles()
         {
             txtCodigoProducto.Text = "";
-            txtCodigoProducto.ReadOnly = false; // Rehabilitar para nuevos registros
+            txtCodigoProducto.ReadOnly = false;
+
             txtNombreProducto.Text = "";
             txtPrecio.Text = "";
             txtStock.Text = "";
-            if (ddlMarca.Items.Count > 0) ddlMarca.SelectedIndex = 0;
-            if (ddlCategoria.Items.Count > 0) ddlCategoria.SelectedIndex = 0;
+            txtStockMinimo.Text = "";
+
+            if (ddlMarca.Items.Count > 0)
+                ddlMarca.SelectedIndex = 0;
+
+            if (ddlCategoria.Items.Count > 0)
+                ddlCategoria.SelectedIndex = 0;
+
+            dgvProductos.SelectedIndex = -1;
+
+            OcultarDetalle();
+        }
+
+        private void OcultarDetalle()
+        {
+            pnlDetalleProducto.Visible = false;
+        }
+
+        private void MostrarMensaje(string mensaje)
+        {
+            string mensajeSeguro = mensaje
+                .Replace("\\", "\\\\")
+                .Replace("'", "\\'")
+                .Replace("\r", " ")
+                .Replace("\n", " ");
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                Guid.NewGuid().ToString(),
+                "alert('" + mensajeSeguro + "');",
+                true);
         }
     }
 }

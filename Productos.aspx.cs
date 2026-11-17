@@ -11,7 +11,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Productos : System.Web.UI.Page
     {
-        
+     
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -21,58 +21,58 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-        
+      
         private void CargarDesplegables()
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-             
+            
                 SqlDataAdapter daMarcas = new SqlDataAdapter(
-                    "SELECT Id, Nombre FROM Marcas ORDER BY Nombre", conn);
+                    "SELECT Codigo, Nombre FROM Marcas ORDER BY Nombre", conn);
 
                 DataTable dtMarcas = new DataTable();
                 daMarcas.Fill(dtMarcas);
 
                 ddlMarca.DataSource = dtMarcas;
                 ddlMarca.DataTextField = "Nombre";
-                ddlMarca.DataValueField = "Id";
+                ddlMarca.DataValueField = "Codigo";
                 ddlMarca.DataBind();
 
-                ddlMarca.Items.Insert(0, new ListItem("Seleccione una marca", "0"));
+                ddlMarca.Items.Insert(0, new ListItem("Seleccione una marca", ""));
 
                 ddlFiltroMarca.DataSource = dtMarcas;
                 ddlFiltroMarca.DataTextField = "Nombre";
-                ddlFiltroMarca.DataValueField = "Id";
+                ddlFiltroMarca.DataValueField = "Codigo";
                 ddlFiltroMarca.DataBind();
 
-                ddlFiltroMarca.Items.Insert(0, new ListItem("Todas las marcas", "0"));
+                ddlFiltroMarca.Items.Insert(0, new ListItem("Todas las marcas", ""));
 
-                
+              
                 SqlDataAdapter daCategorias = new SqlDataAdapter(
-                    "SELECT Id, Nombre FROM Categorias ORDER BY Nombre", conn);
+                    "SELECT Codigo, Nombre FROM Categorias ORDER BY Nombre", conn);
 
                 DataTable dtCategorias = new DataTable();
                 daCategorias.Fill(dtCategorias);
 
                 ddlCategoria.DataSource = dtCategorias;
                 ddlCategoria.DataTextField = "Nombre";
-                ddlCategoria.DataValueField = "Id";
+                ddlCategoria.DataValueField = "Codigo";
                 ddlCategoria.DataBind();
 
-                ddlCategoria.Items.Insert(0, new ListItem("Seleccione una categoría", "0"));
+                ddlCategoria.Items.Insert(0, new ListItem("Seleccione una categoría", ""));
 
                 ddlFiltroCategoria.DataSource = dtCategorias;
                 ddlFiltroCategoria.DataTextField = "Nombre";
-                ddlFiltroCategoria.DataValueField = "Id";
+                ddlFiltroCategoria.DataValueField = "Codigo";
                 ddlFiltroCategoria.DataBind();
 
-                ddlFiltroCategoria.Items.Insert(0, new ListItem("Todas las categorías", "0"));
+                ddlFiltroCategoria.Items.Insert(0, new ListItem("Todas las categorías", ""));
             }
         }
 
-
+    
         private void CargarGrilla()
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
@@ -89,13 +89,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         P.Stock,
                         P.StockMinimo
                     FROM Productos P
-                    INNER JOIN Marcas M ON P.IdMarca = M.Id
-                    INNER JOIN Categorias C ON P.IdCategoria = C.Id
+                    INNER JOIN Marcas M ON P.MarcaCodigo = M.Codigo
+                    INNER JOIN Categorias C ON P.CategoriaCodigo = C.Codigo
                     WHERE
                         (@Texto = '' OR P.Codigo LIKE '%' + @Texto + '%'
                         OR P.Nombre LIKE '%' + @Texto + '%')
-                        AND (@IdMarca = 0 OR P.IdMarca = @IdMarca)
-                        AND (@IdCategoria = 0 OR P.IdCategoria = @IdCategoria)
+                        AND (@MarcaCodigo = '' OR P.MarcaCodigo = @MarcaCodigo)
+                        AND (@CategoriaCodigo = '' OR P.CategoriaCodigo = @CategoriaCodigo)
                     ORDER BY P.Nombre";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -103,15 +103,11 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 cmd.Parameters.Add("@Texto", SqlDbType.VarChar, 120).Value =
                     txtBuscar.Text.Trim();
 
-                int idMarca = 0;
-                int.TryParse(ddlFiltroMarca.SelectedValue, out idMarca);
+                cmd.Parameters.Add("@MarcaCodigo", SqlDbType.VarChar, 20).Value =
+                    ddlFiltroMarca.SelectedValue;
 
-                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
-
-                int idCategoria = 0;
-                int.TryParse(ddlFiltroCategoria.SelectedValue, out idCategoria);
-
-                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
+                cmd.Parameters.Add("@CategoriaCodigo", SqlDbType.VarChar, 20).Value =
+                    ddlFiltroCategoria.SelectedValue;
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -123,22 +119,20 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+    
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
             OcultarDetalle();
             CargarGrilla();
         }
 
-
+        
         protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
         {
             txtBuscar.Text = "";
 
-            if (ddlFiltroMarca.Items.Count > 0)
-                ddlFiltroMarca.SelectedIndex = 0;
-
-            if (ddlFiltroCategoria.Items.Count > 0)
-                ddlFiltroCategoria.SelectedIndex = 0;
+            ddlFiltroMarca.SelectedIndex = 0;
+            ddlFiltroCategoria.SelectedIndex = 0;
 
             dgvProductos.SelectedIndex = -1;
 
@@ -146,7 +140,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             CargarGrilla();
         }
 
-  
+       
         protected void dgvProductos_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (dgvProductos.SelectedDataKey == null)
@@ -167,11 +161,11 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         P.Precio,
                         P.Stock,
                         P.StockMinimo,
-                        P.IdMarca,
-                        P.IdCategoria
+                        P.MarcaCodigo,
+                        P.CategoriaCodigo
                     FROM Productos P
-                    INNER JOIN Marcas M ON P.IdMarca = M.Id
-                    INNER JOIN Categorias C ON P.IdCategoria = C.Id
+                    INNER JOIN Marcas M ON P.MarcaCodigo = M.Codigo
+                    INNER JOIN Categorias C ON P.CategoriaCodigo = C.Codigo
                     WHERE P.Codigo = @Codigo";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -183,7 +177,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 {
                     if (reader.Read())
                     {
-                      
                         txtCodigoProducto.Text = reader["Codigo"].ToString();
                         txtCodigoProducto.ReadOnly = true;
 
@@ -192,16 +185,16 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         txtStock.Text = reader["Stock"].ToString();
                         txtStockMinimo.Text = reader["StockMinimo"].ToString();
 
-                        string idMarca = reader["IdMarca"].ToString();
-                        string idCategoria = reader["IdCategoria"].ToString();
+                        string marcaCodigo = reader["MarcaCodigo"].ToString();
+                        string categoriaCodigo = reader["CategoriaCodigo"].ToString();
 
-                        if (ddlMarca.Items.FindByValue(idMarca) != null)
-                            ddlMarca.SelectedValue = idMarca;
+                        if (ddlMarca.Items.FindByValue(marcaCodigo) != null)
+                            ddlMarca.SelectedValue = marcaCodigo;
 
-                        if (ddlCategoria.Items.FindByValue(idCategoria) != null)
-                            ddlCategoria.SelectedValue = idCategoria;
+                        if (ddlCategoria.Items.FindByValue(categoriaCodigo) != null)
+                            ddlCategoria.SelectedValue = categoriaCodigo;
 
-                  
+                        
                         lblDetalleCodigo.Text = reader["Codigo"].ToString();
                         lblDetalleNombre.Text = reader["Nombre"].ToString();
                         lblDetalleMarca.Text = reader["Marca"].ToString();
@@ -216,18 +209,19 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+    
         private bool ValidarProducto(
             out decimal precio,
             out int stock,
             out int stockMinimo,
-            out int idMarca,
-            out int idCategoria)
+            out string marcaCodigo,
+            out string categoriaCodigo)
         {
             precio = 0;
             stock = 0;
             stockMinimo = 0;
-            idMarca = 0;
-            idCategoria = 0;
+            marcaCodigo = ddlMarca.SelectedValue;
+            categoriaCodigo = ddlCategoria.SelectedValue;
 
             if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text) ||
                 string.IsNullOrWhiteSpace(txtNombreProducto.Text))
@@ -263,13 +257,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 return false;
             }
 
-            if (!int.TryParse(ddlMarca.SelectedValue, out idMarca) || idMarca <= 0)
+            if (string.IsNullOrWhiteSpace(marcaCodigo))
             {
                 MostrarMensaje("Seleccione una marca.");
                 return false;
             }
 
-            if (!int.TryParse(ddlCategoria.SelectedValue, out idCategoria) || idCategoria <= 0)
+            if (string.IsNullOrWhiteSpace(categoriaCodigo))
             {
                 MostrarMensaje("Seleccione una categoría.");
                 return false;
@@ -278,15 +272,17 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             return true;
         }
 
+   
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             decimal precio;
             int stock;
             int stockMinimo;
-            int idMarca;
-            int idCategoria;
+            string marcaCodigo;
+            string categoriaCodigo;
 
-            if (!ValidarProducto(out precio, out stock, out stockMinimo, out idMarca, out idCategoria))
+            if (!ValidarProducto(out precio, out stock, out stockMinimo,
+                out marcaCodigo, out categoriaCodigo))
                 return;
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
@@ -295,9 +291,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             {
                 string query = @"
                     INSERT INTO Productos
-                    (Codigo, Nombre, Precio, Stock, StockMinimo, IdMarca, IdCategoria)
+                    (Codigo, Nombre, Precio, Stock, StockMinimo, MarcaCodigo, CategoriaCodigo)
                     VALUES
-                    (@Codigo, @Nombre, @Precio, @Stock, @StockMinimo, @IdMarca, @IdCategoria)";
+                    (@Codigo, @Nombre, @Precio, @Stock, @StockMinimo, @MarcaCodigo, @CategoriaCodigo)";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -313,8 +309,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
                 cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = stock;
                 cmd.Parameters.Add("@StockMinimo", SqlDbType.Int).Value = stockMinimo;
-                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
-                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
+
+                cmd.Parameters.Add("@MarcaCodigo", SqlDbType.VarChar, 20).Value = marcaCodigo;
+                cmd.Parameters.Add("@CategoriaCodigo", SqlDbType.VarChar, 20).Value = categoriaCodigo;
 
                 try
                 {
@@ -340,15 +337,17 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+      
         protected void btnModificar_Click(object sender, EventArgs e)
         {
             decimal precio;
             int stock;
             int stockMinimo;
-            int idMarca;
-            int idCategoria;
+            string marcaCodigo;
+            string categoriaCodigo;
 
-            if (!ValidarProducto(out precio, out stock, out stockMinimo, out idMarca, out idCategoria))
+            if (!ValidarProducto(out precio, out stock, out stockMinimo,
+                out marcaCodigo, out categoriaCodigo))
                 return;
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
@@ -361,12 +360,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         Precio = @Precio,
                         Stock = @Stock,
                         StockMinimo = @StockMinimo,
-                        IdMarca = @IdMarca,
-                        IdCategoria = @IdCategoria
+                        MarcaCodigo = @MarcaCodigo,
+                        CategoriaCodigo = @CategoriaCodigo
                     WHERE Codigo = @Codigo";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
-               
+
                 cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
                     txtCodigoProducto.Text.Trim();
 
@@ -379,8 +378,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
                 cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = stock;
                 cmd.Parameters.Add("@StockMinimo", SqlDbType.Int).Value = stockMinimo;
-                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
-                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
+
+                cmd.Parameters.Add("@MarcaCodigo", SqlDbType.VarChar, 20).Value = marcaCodigo;
+                cmd.Parameters.Add("@CategoriaCodigo", SqlDbType.VarChar, 20).Value = categoriaCodigo;
 
                 conn.Open();
 
@@ -400,6 +400,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+     
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text))
@@ -437,6 +438,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+       
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarControles();
@@ -468,6 +470,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             pnlDetalleProducto.Visible = false;
         }
 
+     
         private void MostrarMensaje(string mensaje)
         {
             string mensajeSeguro = mensaje

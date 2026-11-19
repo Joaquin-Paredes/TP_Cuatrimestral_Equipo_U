@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="Productos" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Productos.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Productos" %>
+﻿<%@ Page Title="Productos" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Productos.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Productos" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -7,6 +6,10 @@
 
         <h2>Gestión de Productos</h2>
         <hr />
+
+        <div class="mb-3">
+            <asp:CheckBox ID="chkVerInactivos" runat="server" Text=" Mostrar productos eliminados" AutoPostBack="true" CssClass="form-check-label fw-bold text-danger" OnCheckedChanged="chkVerInactivos_CheckedChanged" />
+        </div>
 
         <div class="card p-4 mb-4">
 
@@ -70,7 +73,7 @@
 
             </div>
 
-            <div class="mt-2">
+            <div class="mt-2 d-flex align-items-center flex-wrap gap-2">
 
                 <asp:Button ID="btnAgregar" runat="server"
                     Text="Agregar"
@@ -88,11 +91,19 @@
                     OnClick="btnEliminar_Click"
                     CausesValidation="false" />
 
+                <asp:Button ID="btnReactivar" runat="server" 
+                    Text="Reactivar" 
+                    CssClass="btn btn-success" 
+                    OnClick="btnReactivar_Click" 
+                    CausesValidation="false" />
+
                 <asp:Button ID="btnLimpiar" runat="server"
                     Text="Limpiar"
                     CssClass="btn btn-secondary"
                     OnClick="btnLimpiar_Click"
                     CausesValidation="false" />
+                
+                <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
 
             </div>
 
@@ -163,7 +174,7 @@
                     <asp:CommandField
                         ShowSelectButton="True"
                         SelectText="Ver detalle"
-                        HeaderText="Acción" />
+                        HeaderText="Acción" ControlStyle-CssClass="btn btn-sm btn-outline-primary" />
 
                     <asp:BoundField
                         DataField="Codigo"

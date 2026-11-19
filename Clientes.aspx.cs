@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
@@ -10,7 +9,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Clientes : System.Web.UI.Page
     {
-     
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -19,10 +17,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-
-
         private void CargarGrilla()
         {
+            int estado = chkVerInactivos.Checked ? 0 : 1;
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
@@ -35,11 +32,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 Telefono,
                 Direccion AS Domicilio
             FROM Clientes
-WHERE Estado = 1
+            WHERE Estado = @Estado
             ORDER BY NombreCompleto";
 
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
 
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
 
                 da.Fill(dt);
@@ -48,7 +47,6 @@ WHERE Estado = 1
                 dgvClientes.DataBind();
             }
         }
-
 
         protected void dgvClientes_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -64,7 +62,7 @@ WHERE Estado = 1
                 string query = @"
                     SELECT CUIT, NombreCompleto, Email, Telefono, Direccion
                     FROM Clientes
-                    WHERE CUIT = @CUIT AND Estado = 1";
+                    WHERE CUIT = @CUIT";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = cuit;
@@ -87,25 +85,23 @@ WHERE Estado = 1
             }
         }
 
-
         private bool ValidarCliente()
         {
             if (string.IsNullOrWhiteSpace(txtCodigoCliente.Text))
             {
-                MostrarMensaje("Debe ingresar el CUIT del cliente.");
+                MostrarMensaje("Debe ingresar el CUIT del cliente.", false);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(txtNombre.Text))
             {
-                MostrarMensaje("Debe ingresar el nombre completo del cliente.");
+                MostrarMensaje("Debe ingresar el nombre completo del cliente.", false);
                 return false;
             }
 
             return true;
         }
 
-    
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCliente())
@@ -146,7 +142,7 @@ WHERE Estado = 1
                     conn.Open();
                     cmd.ExecuteNonQuery();
 
-                    MostrarMensaje("Cliente agregado correctamente.");
+                    MostrarMensaje("Cliente agregado correctamente.", true);
 
                     LimpiarControles();
                     CargarGrilla();
@@ -155,17 +151,16 @@ WHERE Estado = 1
                 {
                     if (ex.Number == 2627 || ex.Number == 2601)
                     {
-                        MostrarMensaje("Ya existe un cliente registrado con ese CUIT.");
+                        MostrarMensaje("Ya existe un cliente registrado con ese CUIT.", false);
                     }
                     else
                     {
-                        MostrarMensaje("Error al agregar el cliente. Revisá los datos.");
+                        MostrarMensaje("Error al agregar el cliente. Revisá los datos.", false);
                     }
                 }
             }
         }
 
-    
         protected void btnModificar_Click(object sender, EventArgs e)
         {
             if (!ValidarCliente())
@@ -209,24 +204,23 @@ WHERE Estado = 1
 
                 if (filas > 0)
                 {
-                    MostrarMensaje("Cliente modificado correctamente.");
+                    MostrarMensaje("Cliente modificado correctamente.", true);
 
                     LimpiarControles();
                     CargarGrilla();
                 }
                 else
                 {
-                    MostrarMensaje("No se encontró el cliente que desea modificar.");
+                    MostrarMensaje("No se encontró el cliente que desea modificar.", false);
                 }
             }
         }
 
-     
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoCliente.Text))
             {
-                MostrarMensaje("Seleccione un cliente para eliminar.");
+                MostrarMensaje("Seleccione un cliente para eliminar.", false);
                 return;
             }
 
@@ -249,34 +243,76 @@ WHERE Estado = 1
 
                     if (filas > 0)
                     {
-                        MostrarMensaje("Cliente eliminado correctamente.");
+                        MostrarMensaje("Cliente eliminado correctamente.", true);
 
                         LimpiarControles();
                         CargarGrilla();
                     }
                     else
                     {
-                        MostrarMensaje("No se encontró el cliente que desea eliminar.");
+                        MostrarMensaje("No se encontró el cliente que desea eliminar.", false);
                     }
                 }
                 catch (SqlException ex)
                 {
                     if (ex.Number == 547)
                     {
-                        MostrarMensaje("No se puede eliminar el cliente porque tiene registros relacionados.");
+                        MostrarMensaje("No se puede eliminar el cliente porque tiene registros relacionados.", false);
                     }
                     else
                     {
-                        MostrarMensaje("Error al eliminar el cliente.");
+                        MostrarMensaje("Error al eliminar el cliente.", false);
                     }
                 }
             }
         }
 
-     
+        protected void chkVerInactivos_CheckedChanged(object sender, EventArgs e)
+        {
+            LimpiarControles();
+            CargarGrilla();
+        }
+
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigoCliente.Text))
+            {
+                MostrarMensaje("Seleccione un cliente inactivo para reactivar.", false);
+                return;
+            }
+
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                SqlCommand cmd = new SqlCommand("UPDATE Clientes SET Estado = 1 WHERE CUIT = @CUIT", conn);
+                cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = txtCodigoCliente.Text.Trim();
+                try
+                {
+                    conn.Open();
+                    int filas = cmd.ExecuteNonQuery();
+                    if (filas > 0)
+                    {
+                        MostrarMensaje("Cliente reactivado correctamente.", true);
+                        chkVerInactivos.Checked = false;
+                        LimpiarControles();
+                        CargarGrilla();
+                    }
+                    else
+                    {
+                        MostrarMensaje("No se encontró el cliente.", false);
+                    }
+                }
+                catch (Exception)
+                {
+                    MostrarMensaje("Error al reactivar el cliente.", false);
+                }
+            }
+        }
+
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarControles();
+            MostrarMensaje("", true);
         }
 
         private void LimpiarControles()
@@ -292,17 +328,10 @@ WHERE Estado = 1
             dgvClientes.SelectedIndex = -1;
         }
 
-      
-        private void MostrarMensaje(string mensaje)
+        private void MostrarMensaje(string mensaje, bool correcto)
         {
-            string mensajeSeguro = HttpUtility.JavaScriptStringEncode(mensaje);
-
-            ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                Guid.NewGuid().ToString(),
-                "alert('" + mensajeSeguro + "');",
-                true);
+            lblMensaje.Text = HttpUtility.HtmlEncode(mensaje);
+            lblMensaje.CssClass = correcto ? "ms-3 fw-bold text-success" : "ms-3 fw-bold text-danger";
         }
     }
 }

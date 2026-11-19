@@ -1,11 +1,14 @@
-﻿
-<%@ Page Title="Categorías" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Categorias.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Categorias" %>
+﻿<%@ Page Title="Categorías" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Categorias.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Categorias" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
     <main>
         <h2>Gestión de Categorías</h2>
         <hr />
+        
+        <div class="mb-3">
+            <asp:CheckBox ID="chkVerInactivos" runat="server" Text=" Mostrar categorías eliminadas" AutoPostBack="true" CssClass="form-check-label fw-bold text-danger" OnCheckedChanged="chkVerInactivos_CheckedChanged" />
+        </div>
 
         <div class="card p-4 mb-4">
 
@@ -34,11 +37,13 @@
 
             </div>
 
-            <div class="mt-2">
+            <div class="mt-2 d-flex align-items-center flex-wrap gap-2">
                <asp:Button ID="btnAgregar" runat="server" Text="Agregar" CssClass="btn btn-primary" OnClick="btnAgregar_Click" />
                <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" OnClick="btnModificar_Click" />
                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" />
+               <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" />
                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
+               <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
             </div>
 
         </div>
@@ -48,13 +53,16 @@
         <asp:GridView ID="dgvCategorias" runat="server"
             CssClass="table table-striped table-bordered"
             AutoGenerateColumns="False"
+            DataKeyNames="Codigo"
             ShowHeaderWhenEmpty="True"
-            EmptyDataText="No hay categorías para mostrar.">
+            EmptyDataText="No hay categorías para mostrar."
+            OnSelectedIndexChanged="dgvCategorias_SelectedIndexChanged">
 
             <Columns>
                 <asp:BoundField DataField="Codigo" HeaderText="Código" />
                 <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
                 <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
+                <asp:CommandField ShowSelectButton="True" SelectText="Seleccionar" ControlStyle-CssClass="btn btn-sm btn-outline-primary" />
             </Columns>
 
         </asp:GridView>

@@ -42,6 +42,15 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         protected global::System.Web.UI.WebControls.Button btnLimpiarBusqueda;
 
         /// <summary>
+        /// Control chkVerInactivos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkVerInactivos;
+
+        /// <summary>
         /// Control txtCUIT.
         /// </summary>
         /// <remarks>
@@ -112,6 +121,15 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnEliminar;
+
+        /// <summary>
+        /// Control btnReactivar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnReactivar;
 
         /// <summary>
         /// Control btnLimpiar.

@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="Proveedores" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Proveedores.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Proveedores" %>
+﻿<%@ Page Title="Proveedores" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Proveedores.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Proveedores" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -17,6 +16,9 @@
                 <div class="col-md-7 mb-2">
                     <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn btn-primary me-2" OnClick="btnBuscar_Click" />
                     <asp:Button ID="btnLimpiarBusqueda" runat="server" Text="Mostrar Todos" CssClass="btn btn-outline-secondary" OnClick="btnLimpiarBusqueda_Click" />
+                </div>
+                <div class="col-12 mt-3">
+                    <asp:CheckBox ID="chkVerInactivos" runat="server" Text=" Mostrar proveedores eliminados" AutoPostBack="true" CssClass="form-check-label fw-bold text-danger" OnCheckedChanged="chkVerInactivos_CheckedChanged" />
                 </div>
             </div>
         </div>
@@ -55,6 +57,9 @@
                 <asp:Button ID="btnAgregar" runat="server" Text="Agregar" CssClass="btn btn-primary" OnClick="btnAgregar_Click" />
                 <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" OnClick="btnModificar_Click" />
                 <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" />
+                
+                <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" />
+                
                 <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
                 
                 <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>

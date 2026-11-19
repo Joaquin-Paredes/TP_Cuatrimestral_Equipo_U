@@ -1,17 +1,16 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web;
 
 namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Productos : System.Web.UI.Page
     {
-     
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -21,14 +20,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-      
         private void CargarDesplegables()
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-            
                 SqlDataAdapter daMarcas = new SqlDataAdapter(
                     "SELECT Codigo, Nombre FROM Marcas ORDER BY Nombre", conn);
 
@@ -49,7 +46,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
                 ddlFiltroMarca.Items.Insert(0, new ListItem("Todas las marcas", ""));
 
-              
                 SqlDataAdapter daCategorias = new SqlDataAdapter(
                     "SELECT Codigo, Nombre FROM Categorias ORDER BY Nombre", conn);
 
@@ -72,9 +68,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-    
         private void CargarGrilla()
         {
+            int estado = chkVerInactivos.Checked ? 0 : 1;
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
@@ -92,9 +88,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     INNER JOIN Marcas M ON P.MarcaCodigo = M.Codigo
                     INNER JOIN Categorias C ON P.CategoriaCodigo = C.Codigo
                     WHERE
-                P.Estado = 1 AND
-                M.Estado = 1 AND
-                C.Estado = 1 AND
+                        P.Estado = @Estado AND
+                        M.Estado = 1 AND
+                        C.Estado = 1 AND
                         (@Texto = '' OR P.Codigo LIKE '%' + @Texto + '%'
                         OR P.Nombre LIKE '%' + @Texto + '%')
                         AND (@MarcaCodigo = '' OR P.MarcaCodigo = @MarcaCodigo)
@@ -102,6 +98,8 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     ORDER BY P.Nombre";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
+
+                cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
 
                 cmd.Parameters.Add("@Texto", SqlDbType.VarChar, 120).Value =
                     txtBuscar.Text.Trim();
@@ -122,14 +120,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-    
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
             OcultarDetalle();
             CargarGrilla();
         }
 
-        
         protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
         {
             txtBuscar.Text = "";
@@ -143,7 +139,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             CargarGrilla();
         }
 
-       
         protected void dgvProductos_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (dgvProductos.SelectedDataKey == null)
@@ -197,7 +192,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         if (ddlCategoria.Items.FindByValue(categoriaCodigo) != null)
                             ddlCategoria.SelectedValue = categoriaCodigo;
 
-                        
                         lblDetalleCodigo.Text = reader["Codigo"].ToString();
                         lblDetalleNombre.Text = reader["Nombre"].ToString();
                         lblDetalleMarca.Text = reader["Marca"].ToString();
@@ -212,7 +206,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-    
         private bool ValidarProducto(
             out decimal precio,
             out int stock,
@@ -229,7 +222,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text) ||
                 string.IsNullOrWhiteSpace(txtNombreProducto.Text))
             {
-                MostrarMensaje("Debe ingresar el código y el nombre del producto.");
+                MostrarMensaje("Debe ingresar el código y el nombre del producto.", false);
                 return false;
             }
 
@@ -238,44 +231,43 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 !decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Number,
                     CultureInfo.InvariantCulture, out precio))
             {
-                MostrarMensaje("Ingrese un precio válido.");
+                MostrarMensaje("Ingrese un precio válido.", false);
                 return false;
             }
 
             if (precio < 0)
             {
-                MostrarMensaje("El precio no puede ser negativo.");
+                MostrarMensaje("El precio no puede ser negativo.", false);
                 return false;
             }
 
             if (!int.TryParse(txtStock.Text, out stock) || stock < 0)
             {
-                MostrarMensaje("Ingrese una cantidad de stock válida.");
+                MostrarMensaje("Ingrese una cantidad de stock válida.", false);
                 return false;
             }
 
             if (!int.TryParse(txtStockMinimo.Text, out stockMinimo) || stockMinimo < 0)
             {
-                MostrarMensaje("Ingrese un stock mínimo válido.");
+                MostrarMensaje("Ingrese un stock mínimo válido.", false);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(marcaCodigo))
             {
-                MostrarMensaje("Seleccione una marca.");
+                MostrarMensaje("Seleccione una marca.", false);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(categoriaCodigo))
             {
-                MostrarMensaje("Seleccione una categoría.");
+                MostrarMensaje("Seleccione una categoría.", false);
                 return false;
             }
 
             return true;
         }
 
-   
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             decimal precio;
@@ -321,7 +313,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     conn.Open();
                     cmd.ExecuteNonQuery();
 
-                    MostrarMensaje("Producto agregado correctamente.");
+                    MostrarMensaje("Producto agregado correctamente.", true);
 
                     LimpiarControles();
                     CargarGrilla();
@@ -330,17 +322,16 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 {
                     if (ex.Number == 2627 || ex.Number == 2601)
                     {
-                        MostrarMensaje("Ya existe un producto registrado con ese código.");
+                        MostrarMensaje("Ya existe un producto registrado con ese código.", false);
                     }
                     else
                     {
-                        MostrarMensaje("Ocurrió un error al agregar el producto.");
+                        MostrarMensaje("Ocurrió un error al agregar el producto.", false);
                     }
                 }
             }
         }
 
-      
         protected void btnModificar_Click(object sender, EventArgs e)
         {
             decimal precio;
@@ -391,24 +382,23 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
                 if (filas > 0)
                 {
-                    MostrarMensaje("Producto modificado correctamente.");
+                    MostrarMensaje("Producto modificado correctamente.", true);
 
                     LimpiarControles();
                     CargarGrilla();
                 }
                 else
                 {
-                    MostrarMensaje("No se encontró el producto que desea modificar.");
+                    MostrarMensaje("No se encontró el producto que desea modificar.", false);
                 }
             }
         }
 
-     
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text))
             {
-                MostrarMensaje("Seleccione un producto para eliminar.");
+                MostrarMensaje("Seleccione un producto para eliminar.", false);
                 return;
             }
 
@@ -429,22 +419,67 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
                 if (filas > 0)
                 {
-                    MostrarMensaje("Producto eliminado correctamente.");
+                    MostrarMensaje("Producto eliminado correctamente.", true);
 
                     LimpiarControles();
                     CargarGrilla();
                 }
                 else
                 {
-                    MostrarMensaje("No se encontró el producto que desea eliminar.");
+                    MostrarMensaje("No se encontró el producto que desea eliminar.", false);
                 }
             }
         }
 
-       
+        protected void chkVerInactivos_CheckedChanged(object sender, EventArgs e)
+        {
+            LimpiarControles();
+            CargarGrilla();
+        }
+
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigoProducto.Text))
+            {
+                MostrarMensaje("Seleccione un producto inactivo de la lista para reactivarlo.", false);
+                return;
+            }
+
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                string query = "UPDATE Productos SET Estado = 1 WHERE Codigo = @Codigo";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value = txtCodigoProducto.Text.Trim();
+
+                try
+                {
+                    conn.Open();
+                    int filas = cmd.ExecuteNonQuery();
+
+                    if (filas > 0)
+                    {
+                        MostrarMensaje("Producto reactivado correctamente.", true);
+                        chkVerInactivos.Checked = false;
+                        LimpiarControles();
+                        CargarGrilla();
+                    }
+                    else
+                    {
+                        MostrarMensaje("No se encontró el producto.", false);
+                    }
+                }
+                catch (SqlException)
+                {
+                    MostrarMensaje("Error al reactivar el producto.", false);
+                }
+            }
+        }
+
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarControles();
+            MostrarMensaje("", true);
         }
 
         private void LimpiarControles()
@@ -473,21 +508,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             pnlDetalleProducto.Visible = false;
         }
 
-     
-        private void MostrarMensaje(string mensaje)
+        private void MostrarMensaje(string mensaje, bool correcto)
         {
-            string mensajeSeguro = mensaje
-                .Replace("\\", "\\\\")
-                .Replace("'", "\\'")
-                .Replace("\r", " ")
-                .Replace("\n", " ");
-
-            ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                Guid.NewGuid().ToString(),
-                "alert('" + mensajeSeguro + "');",
-                true);
+            lblMensaje.Text = HttpUtility.HtmlEncode(mensaje);
+            lblMensaje.CssClass = correcto ? "ms-3 fw-bold text-success" : "ms-3 fw-bold text-danger";
         }
     }
 }

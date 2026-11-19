@@ -1,11 +1,14 @@
-﻿
-<%@ Page Title="Clientes" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Clientes.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Clientes" %>
+﻿<%@ Page Title="Clientes" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Clientes.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Clientes" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
     <main>
         <h2>Gestión de Clientes</h2>
         <hr />
+
+        <div class="mb-3">
+            <asp:CheckBox ID="chkVerInactivos" runat="server" Text=" Mostrar clientes eliminados" AutoPostBack="true" CssClass="form-check-label fw-bold text-danger" OnCheckedChanged="chkVerInactivos_CheckedChanged" />
+        </div>
 
         <div class="card p-4 mb-4">
             <h4>Datos del Cliente</h4>
@@ -44,7 +47,7 @@
 
             </div>
 
-            <div class="mt-2">
+            <div class="mt-2 d-flex align-items-center flex-wrap gap-2">
 
                 <asp:Button ID="btnAgregar" runat="server"
                     Text="Agregar" CssClass="btn btn-primary"
@@ -58,11 +61,18 @@
                     Text="Eliminar" CssClass="btn btn-danger"
                     OnClick="btnEliminar_Click"
                     CausesValidation="false" />
+                
+                <asp:Button ID="btnReactivar" runat="server" 
+                    Text="Reactivar" CssClass="btn btn-success" 
+                    OnClick="btnReactivar_Click" 
+                    CausesValidation="false" />
 
                 <asp:Button ID="btnLimpiar" runat="server"
                     Text="Limpiar" CssClass="btn btn-secondary"
                     OnClick="btnLimpiar_Click"
                     CausesValidation="false" />
+
+                <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
 
             </div>
         </div>
@@ -82,7 +92,7 @@
                 <Columns>
 
                     <asp:CommandField ShowSelectButton="True"
-                        SelectText="Seleccionar" HeaderText="Acción" />
+                        SelectText="Seleccionar" HeaderText="Acción" ControlStyle-CssClass="btn btn-sm btn-outline-primary" />
 
                     <asp:BoundField DataField="Codigo" HeaderText="CUIT" />
                     <asp:BoundField DataField="Nombre" HeaderText="Nombre Completo" />

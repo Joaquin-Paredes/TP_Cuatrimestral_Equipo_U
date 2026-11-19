@@ -9,7 +9,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Proveedores : System.Web.UI.Page
     {
-       
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -18,13 +18,14 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-
         private void CargarGrilla(string cuit = "")
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
+                int estado = chkVerInactivos.Checked ? 0 : 1;
+
                 string query = @"
                 SELECT
                     CUIT,
@@ -32,11 +33,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     Telefono,
                     Email,
                     Direccion
-                FROM Proveedores WHERE Estado = 1 AND (@CUIT = '' OR CUIT LIKE '%' + @CUIT + '%')
+                FROM Proveedores 
+                WHERE Estado = @Estado AND (@CUIT = '' OR CUIT LIKE '%' + @CUIT + '%')
                 ORDER BY RazonSocial";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
+                cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
                 cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = cuit.Trim();
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -78,7 +81,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-       
+
         private bool CargarProveedorEnFormulario(string cuit)
         {
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
@@ -122,7 +125,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             return false;
         }
 
-       
+
         protected void btnLimpiarBusqueda_Click(object sender, EventArgs e)
         {
             txtBuscarCuit.Text = "";
@@ -134,7 +137,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             MostrarMensaje("Se muestran todos los proveedores.", true);
         }
 
-       
+
         protected void dgvProveedores_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (dgvProveedores.SelectedDataKey == null)
@@ -148,7 +151,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-       
+
         private bool ValidarProveedor()
         {
             if (string.IsNullOrWhiteSpace(txtCUIT.Text))
@@ -166,7 +169,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             return true;
         }
 
-      
+
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarProveedor())
@@ -227,7 +230,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-      
+
         protected void btnModificar_Click(object sender, EventArgs e)
         {
             if (!ValidarProveedor())
@@ -284,7 +287,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-       
+
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCUIT.Text))
@@ -330,6 +333,54 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+        protected void chkVerInactivos_CheckedChanged(object sender, EventArgs e)
+        {
+            LimpiarControles();
+            txtBuscarCuit.Text = "";
+            CargarGrilla();
+        }
+
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCUIT.Text))
+            {
+                MostrarMensaje("Seleccione un proveedor inactivo de la lista para reactivarlo.", false);
+                return;
+            }
+
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                string query = "UPDATE Proveedores SET Estado = 1 WHERE CUIT = @CUIT";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = txtCUIT.Text.Trim();
+
+                try
+                {
+                    conn.Open();
+                    int filas = cmd.ExecuteNonQuery();
+
+                    if (filas > 0)
+                    {
+                        MostrarMensaje("Proveedor reactivado correctamente.", true);
+
+                        chkVerInactivos.Checked = false;
+                        LimpiarControles();
+                        txtBuscarCuit.Text = "";
+                        CargarGrilla();
+                    }
+                    else
+                    {
+                        MostrarMensaje("No se encontró el proveedor.", false);
+                    }
+                }
+                catch (SqlException)
+                {
+                    MostrarMensaje("Error al reactivar el proveedor.", false);
+                }
+            }
+        }
+
 
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
@@ -350,7 +401,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             dgvProveedores.SelectedIndex = -1;
         }
 
-        
+
         private void MostrarMensaje(string mensaje, bool correcto)
         {
             lblMensaje.Text = HttpUtility.HtmlEncode(mensaje);

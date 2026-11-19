@@ -26,15 +26,14 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 string query = @"
-                    SELECT
-                        CUIT,
-                        RazonSocial,
-                        Telefono,
-                        Email,
-                        Direccion
-                    FROM Proveedores
-                    WHERE (@CUIT = '' OR CUIT LIKE '%' + @CUIT + '%')
-                    ORDER BY RazonSocial";
+                SELECT
+                    CUIT,
+                    RazonSocial,
+                    Telefono,
+                    Email,
+                    Direccion
+                FROM Proveedores WHERE Estado = 1 AND (@CUIT = '' OR CUIT LIKE '%' + @CUIT + '%')
+                ORDER BY RazonSocial";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -50,7 +49,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-      
+
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
             string cuit = txtBuscarCuit.Text.Trim();
@@ -298,7 +297,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "DELETE FROM Proveedores WHERE CUIT = @CUIT";
+                string query = "UPDATE Proveedores SET Estado = 0 WHERE CUIT = @CUIT";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -324,16 +323,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         MostrarMensaje("No se encontró el proveedor que desea eliminar.", false);
                     }
                 }
-                catch (SqlException ex)
+                catch (SqlException)
                 {
-                    if (ex.Number == 547)
-                    {
-                        MostrarMensaje("No se puede eliminar el proveedor porque tiene registros relacionados.", false);
-                    }
-                    else
-                    {
-                        MostrarMensaje("Error al eliminar el proveedor.", false);
-                    }
+                    MostrarMensaje("Error al eliminar el proveedor.", false);
                 }
             }
         }

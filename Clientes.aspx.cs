@@ -35,6 +35,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 Telefono,
                 Direccion AS Domicilio
             FROM Clientes
+WHERE Estado = 1
             ORDER BY NombreCompleto";
 
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
@@ -63,7 +64,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 string query = @"
                     SELECT CUIT, NombreCompleto, Email, Telefono, Direccion
                     FROM Clientes
-                    WHERE CUIT = @CUIT";
+                    WHERE CUIT = @CUIT AND Estado = 1";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = cuit;
@@ -116,9 +117,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             {
                 string query = @"
                     INSERT INTO Clientes
-                    (CUIT, NombreCompleto, Email, Telefono, Direccion)
+                    (CUIT, NombreCompleto, Email, Telefono, Direccion, Estado)
                     VALUES
-                    (@CUIT, @NombreCompleto, @Email, @Telefono, @Direccion)";
+                    (@CUIT, @NombreCompleto, @Email, @Telefono, @Direccion, 1)";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -180,7 +181,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         Email = @Email,
                         Telefono = @Telefono,
                         Direccion = @Direccion
-                    WHERE CUIT = @CUIT";
+                    WHERE CUIT = @CUIT AND Estado = 1";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -233,7 +234,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "DELETE FROM Clientes WHERE CUIT = @CUIT";
+                string query = "UPDATE Clientes SET Estado = 0 WHERE CUIT = @CUIT AND Estado = 1";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 

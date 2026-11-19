@@ -16,7 +16,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Marcas", conn);
+                SqlCommand cmd = new SqlCommand("SELECT Codigo, Nombre FROM Marcas WHERE Estado = 1", conn);
                 conn.Open();
                 dgvMarcas.DataSource = cmd.ExecuteReader();
                 dgvMarcas.DataBind();
@@ -28,7 +28,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("INSERT INTO Marcas (Codigo, Nombre) VALUES (@Codigo, @Nombre)", conn);
+                SqlCommand cmd = new SqlCommand("INSERT INTO Marcas (Codigo, Nombre, Estado) VALUES (@Codigo, @Nombre, 1)", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoMarca.Text);
                 cmd.Parameters.AddWithValue("@Nombre", txtNombreMarca.Text);
                 conn.Open();
@@ -42,7 +42,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("UPDATE Marcas SET Nombre = @Nombre WHERE Codigo = @Codigo", conn);
+                SqlCommand cmd = new SqlCommand("UPDATE Marcas SET Nombre = @Nombre WHERE Codigo = @Codigo AND Estado = 1", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoMarca.Text);
                 cmd.Parameters.AddWithValue("@Nombre", txtNombreMarca.Text);
                 conn.Open();
@@ -56,7 +56,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM Marcas WHERE Codigo = @Codigo", conn);
+                SqlCommand cmd = new SqlCommand("UPDATE Marcas SET Estado = 0 WHERE Codigo = @Codigo AND Estado = 1", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoMarca.Text);
                 conn.Open();
                 cmd.ExecuteNonQuery();

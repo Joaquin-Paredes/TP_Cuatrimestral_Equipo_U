@@ -92,6 +92,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     INNER JOIN Marcas M ON P.MarcaCodigo = M.Codigo
                     INNER JOIN Categorias C ON P.CategoriaCodigo = C.Codigo
                     WHERE
+                P.Estado = 1 AND
+                M.Estado = 1 AND
+                C.Estado = 1 AND
                         (@Texto = '' OR P.Codigo LIKE '%' + @Texto + '%'
                         OR P.Nombre LIKE '%' + @Texto + '%')
                         AND (@MarcaCodigo = '' OR P.MarcaCodigo = @MarcaCodigo)
@@ -362,7 +365,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         StockMinimo = @StockMinimo,
                         MarcaCodigo = @MarcaCodigo,
                         CategoriaCodigo = @CategoriaCodigo
-                    WHERE Codigo = @Codigo";
+                    WHERE Codigo = @Codigo AND Estado = 1";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -413,7 +416,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "DELETE FROM Productos WHERE Codigo = @Codigo";
+                string query = "UPDATE Productos SET Estado = 0 WHERE Codigo = @Codigo AND Estado = 1";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 

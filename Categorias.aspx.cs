@@ -21,7 +21,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Categorias", conn);
+                SqlCommand cmd = new SqlCommand("SELECT Codigo, Nombre, Descripcion FROM Categorias WHERE Estado = 1", conn);
                 conn.Open();
                 dgvCategorias.DataSource = cmd.ExecuteReader();
                 dgvCategorias.DataBind();
@@ -32,7 +32,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("INSERT INTO Categorias (Codigo, Nombre, Descripcion) VALUES (@Codigo, @Nombre, @Desc)", conn);
+                SqlCommand cmd = new SqlCommand("INSERT INTO Categorias (Codigo, Nombre, Descripcion, Estado) VALUES (@Codigo, @Nombre, @Desc, 1)", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoCategoria.Text);
                 cmd.Parameters.AddWithValue("@Nombre", txtNombreCategoria.Text);
                 cmd.Parameters.AddWithValue("@Desc", txtDescripcion.Text);
@@ -47,7 +47,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("UPDATE Categorias SET Nombre = @Nombre, Descripcion = @Desc WHERE Codigo = @Codigo", conn);
+                SqlCommand cmd = new SqlCommand("UPDATE Categorias SET Nombre = @Nombre, Descripcion = @Desc WHERE Codigo = @Codigo AND Estado = 1", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoCategoria.Text);
                 cmd.Parameters.AddWithValue("@Nombre", txtNombreCategoria.Text);
                 cmd.Parameters.AddWithValue("@Desc", txtDescripcion.Text);
@@ -62,7 +62,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM Categorias WHERE Codigo = @Codigo", conn);
+                SqlCommand cmd = new SqlCommand("UPDATE Categorias SET Estado = 0 WHERE Codigo = @Codigo AND Estado = 1", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoCategoria.Text);
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -83,7 +83,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 
-                SqlCommand cmd = new SqlCommand("INSERT INTO Categorias (Codigo, Nombre, Descripcion) VALUES (@Codigo, @Nombre, @Desc)", conn);
+                SqlCommand cmd = new SqlCommand("INSERT INTO Categorias (Codigo, Nombre, Descripcion, Estado) VALUES (@Codigo, @Nombre, @Desc, 1)", conn);
                 cmd.Parameters.AddWithValue("@Codigo", txtCodigoCategoria.Text);
                 cmd.Parameters.AddWithValue("@Nombre", txtNombreCategoria.Text);
                 cmd.Parameters.AddWithValue("@Desc", txtDescripcion.Text);

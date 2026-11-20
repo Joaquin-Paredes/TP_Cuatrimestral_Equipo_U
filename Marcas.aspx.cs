@@ -182,7 +182,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
         private void MostrarMensaje(string mensaje, bool correcto)
         {
-            lblMensaje.Text = HttpUtility.HtmlEncode(mensaje);
+            lblMensaje.Text = mensaje;
             lblMensaje.CssClass = correcto ? "ms-3 fw-bold text-success" : "ms-3 fw-bold text-danger";
         }
     }

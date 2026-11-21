@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
@@ -9,6 +10,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Clientes : System.Web.UI.Page
     {
+    
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -17,23 +19,25 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+  
         private void CargarGrilla()
         {
             int estado = chkVerInactivos.Checked ? 0 : 1;
+
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 string query = @"
-            SELECT
-                CUIT AS Codigo,
-                NombreCompleto AS Nombre,
-                Email,
-                Telefono,
-                Direccion AS Domicilio
-            FROM Clientes
-            WHERE Estado = @Estado
-            ORDER BY NombreCompleto";
+                    SELECT
+                        CUIT AS Codigo,
+                        NombreCompleto AS Nombre,
+                        Email,
+                        Telefono,
+                        Direccion AS Domicilio
+                    FROM dbo.Clientes
+                    WHERE Estado = @Estado
+                    ORDER BY NombreCompleto";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
@@ -48,6 +52,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+     
         protected void dgvClientes_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (dgvClientes.SelectedDataKey == null)
@@ -61,7 +66,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             {
                 string query = @"
                     SELECT CUIT, NombreCompleto, Email, Telefono, Direccion
-                    FROM Clientes
+                    FROM dbo.Clientes
                     WHERE CUIT = @CUIT";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -102,6 +107,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             return true;
         }
 
+  
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCliente())
@@ -112,7 +118,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 string query = @"
-                    INSERT INTO Clientes
+                    INSERT INTO dbo.Clientes
                     (CUIT, NombreCompleto, Email, Telefono, Direccion, Estado)
                     VALUES
                     (@CUIT, @NombreCompleto, @Email, @Telefono, @Direccion, 1)";
@@ -120,7 +126,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 SqlCommand cmd = new SqlCommand(query, conn);
 
                 cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
-                   txtCodigoCliente.Text.Trim();
+                    txtCodigoCliente.Text.Trim();
 
                 cmd.Parameters.Add("@NombreCompleto", SqlDbType.VarChar, 100).Value =
                     txtNombre.Text.Trim();
@@ -155,12 +161,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     }
                     else
                     {
-                        MostrarMensaje("Error al agregar el cliente. Revisá los datos.", false);
+                        MostrarMensaje("Error al agregar el cliente: " + ex.Message, false);
                     }
                 }
             }
         }
 
+      
         protected void btnModificar_Click(object sender, EventArgs e)
         {
             if (!ValidarCliente())
@@ -171,7 +178,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 string query = @"
-                    UPDATE Clientes
+                    UPDATE dbo.Clientes
                     SET NombreCompleto = @NombreCompleto,
                         Email = @Email,
                         Telefono = @Telefono,
@@ -211,11 +218,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 }
                 else
                 {
-                    MostrarMensaje("No se encontró el cliente que desea modificar.", false);
+                    MostrarMensaje("No se encontró el cliente activo que desea modificar.", false);
                 }
             }
         }
 
+      
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoCliente.Text))
@@ -228,7 +236,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = "UPDATE Clientes SET Estado = 0 WHERE CUIT = @CUIT AND Estado = 1";
+                string query = @"
+                    UPDATE dbo.Clientes
+                    SET Estado = 0
+                    WHERE CUIT = @CUIT AND Estado = 1";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -250,7 +261,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     }
                     else
                     {
-                        MostrarMensaje("No se encontró el cliente que desea eliminar.", false);
+                        MostrarMensaje("No se encontró el cliente activo que desea eliminar.", false);
                     }
                 }
                 catch (SqlException ex)
@@ -261,18 +272,20 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     }
                     else
                     {
-                        MostrarMensaje("Error al eliminar el cliente.", false);
+                        MostrarMensaje("Error al eliminar el cliente: " + ex.Message, false);
                     }
                 }
             }
         }
 
+     
         protected void chkVerInactivos_CheckedChanged(object sender, EventArgs e)
         {
             LimpiarControles();
             CargarGrilla();
         }
 
+    
         protected void btnReactivar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoCliente.Text))
@@ -282,33 +295,46 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("UPDATE Clientes SET Estado = 1 WHERE CUIT = @CUIT", conn);
-                cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = txtCodigoCliente.Text.Trim();
+                string query = @"
+                    UPDATE dbo.Clientes
+                    SET Estado = 1
+                    WHERE CUIT = @CUIT AND Estado = 0";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+
+                cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
+                    txtCodigoCliente.Text.Trim();
+
                 try
                 {
                     conn.Open();
+
                     int filas = cmd.ExecuteNonQuery();
+
                     if (filas > 0)
                     {
                         MostrarMensaje("Cliente reactivado correctamente.", true);
+
                         chkVerInactivos.Checked = false;
                         LimpiarControles();
                         CargarGrilla();
                     }
                     else
                     {
-                        MostrarMensaje("No se encontró el cliente.", false);
+                        MostrarMensaje("No se encontró el cliente inactivo.", false);
                     }
                 }
-                catch (Exception)
+                catch (SqlException ex)
                 {
-                    MostrarMensaje("Error al reactivar el cliente.", false);
+                    MostrarMensaje("Error al reactivar el cliente: " + ex.Message, false);
                 }
             }
         }
 
+   
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarControles();
@@ -328,10 +354,14 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             dgvClientes.SelectedIndex = -1;
         }
 
+    
         private void MostrarMensaje(string mensaje, bool correcto)
         {
-            lblMensaje.Text = mensaje;
-            lblMensaje.CssClass = correcto ? "ms-3 fw-bold text-success" : "ms-3 fw-bold text-danger";
+            lblMensaje.Text = HttpUtility.HtmlEncode(mensaje);
+
+            lblMensaje.CssClass = correcto
+                ? "ms-3 fw-bold text-success"
+                : "ms-3 fw-bold text-danger";
         }
     }
 }

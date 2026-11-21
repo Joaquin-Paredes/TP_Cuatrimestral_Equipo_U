@@ -54,4 +54,24 @@ CREATE TABLE Productos (
 );
 GO
 
+CREATE TABLE Ventas (
+    NumeroVenta VARCHAR(20) NOT NULL PRIMARY KEY,
+    Fecha DATE NOT NULL,
+    Cliente VARCHAR(100) NOT NULL,
+    Vendedor VARCHAR(100) NULL,
+    Total DECIMAL(18,2) NOT NULL,
+    Estado BIT DEFAULT 1
+);
+GO
+
+CREATE TABLE DetalleVenta (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    NumeroVenta VARCHAR(20) NOT NULL,
+    Producto VARCHAR(100) NOT NULL,
+    Cantidad INT NOT NULL,
+    PrecioUnitario DECIMAL(18,2) NOT NULL,
+    Subtotal DECIMAL(18,2) NOT NULL,
+    FOREIGN KEY (NumeroVenta) REFERENCES Ventas(NumeroVenta)
+);
+GO
 

@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="Ventas" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Ventas.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Ventas" %>
+﻿<%@ Page Title="Ventas" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Ventas.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Ventas" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -72,17 +71,13 @@
 
             </div>
 
-            <div class="mt-2">
+            <div class="mt-2 d-flex align-items-center flex-wrap gap-2">
                 <asp:Button ID="btnAgregarProducto" runat="server"
                     Text="Agregar Producto al Carrito"
                     CssClass="btn btn-primary"
                     OnClick="btnAgregarProducto_Click" />
-            </div>
-
-            <div class="mt-3">
-                <asp:Label ID="lblMensajeCarrito" runat="server"
-                    CssClass="fw-bold">
-                </asp:Label>
+                
+                <asp:Label ID="lblMensajeCarrito" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
             </div>
 
         </div>
@@ -99,25 +94,11 @@
                 OnRowDeleting="dgvCarrito_RowDeleting">
 
                 <Columns>
-
-                    <asp:BoundField DataField="Producto"
-                        HeaderText="Producto" />
-
-                    <asp:BoundField DataField="Cantidad"
-                        HeaderText="Cantidad" />
-
-                    <asp:BoundField DataField="PrecioUnitario"
-                        HeaderText="Precio Unitario"
-                        DataFormatString="{0:N2}" />
-
-                    <asp:BoundField DataField="Subtotal"
-                        HeaderText="Subtotal"
-                        DataFormatString="{0:N2}" />
-
-                    <asp:CommandField ShowDeleteButton="True"
-                        DeleteText="Quitar"
-                        HeaderText="Acción" />
-
+                    <asp:BoundField DataField="Producto" HeaderText="Producto" />
+                    <asp:BoundField DataField="Cantidad" HeaderText="Cantidad" />
+                    <asp:BoundField DataField="PrecioUnitario" HeaderText="Precio Unitario" DataFormatString="{0:N2}" />
+                    <asp:BoundField DataField="Subtotal" HeaderText="Subtotal" DataFormatString="{0:N2}" />
+                    <asp:CommandField ShowDeleteButton="True" DeleteText="Quitar" HeaderText="Acción" />
                 </Columns>
 
             </asp:GridView>
@@ -125,21 +106,26 @@
         </div>
 
         <div class="mt-2 mb-4">
-            <button type="button" class="btn btn-success">
-                Registrar Venta
-            </button>
+            <asp:Button ID="btnRegistrarVenta" runat="server" 
+                Text="Registrar Venta" 
+                CssClass="btn btn-success" 
+                OnClick="btnRegistrarVenta_Click" />
 
-            <button type="button" class="btn btn-warning">
-                Modificar
-            </button>
+            <asp:Button ID="btnModificar" runat="server" 
+                Text="Modificar" 
+                CssClass="btn btn-warning" 
+                Enabled="false" />
 
-            <button type="button" class="btn btn-danger">
-                Anular Venta
-            </button>
+            <asp:Button ID="btnAnular" runat="server" 
+                Text="Anular Venta" 
+                CssClass="btn btn-danger" 
+                Enabled="false" />
 
-            <button type="button" class="btn btn-secondary">
-                Limpiar
-            </button>
+            <asp:Button ID="btnLimpiar" runat="server" 
+                Text="Limpiar" 
+                CssClass="btn btn-secondary" 
+                OnClick="btnLimpiar_Click" 
+                CausesValidation="false" />
         </div>
 
         <h4>Listado de Ventas</h4>

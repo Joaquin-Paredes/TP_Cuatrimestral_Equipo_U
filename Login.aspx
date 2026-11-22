@@ -28,6 +28,7 @@
             background: white;
             width: 100%;
             max-width: 420px;
+            flex: 0 0 420px;
             padding: 40px;
             border-radius: 14px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
@@ -138,7 +139,12 @@
 
             <asp:Button ID="btnIniciarSesion" runat="server"
                 Text="Iniciar Sesión"
-                CssClass="btn-login" />
+                CssClass="btn-login" 
+                OnClick="btnIniciarSesion_Click" />
+
+            <div style="margin-top: 12px; min-height: 40px; text-align: center;">
+                <asp:Label ID="lblMensaje" runat="server" ForeColor="#c62828" Font-Bold="true"></asp:Label>
+            </div>
 
             <div class="register-link">
                 ¿No tenés una cuenta?

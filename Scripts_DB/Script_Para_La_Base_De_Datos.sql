@@ -75,3 +75,19 @@ CREATE TABLE DetalleVenta (
 );
 GO
 
+USE GestionComercioDB;
+GO
+
+CREATE TABLE Usuarios (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    NombreUsuario VARCHAR(100) NOT NULL,
+    Email VARCHAR(150) NOT NULL UNIQUE,
+    Contrasenia VARCHAR(255) NOT NULL,
+    EsAdmin BIT NOT NULL DEFAULT 0,
+    Estado BIT DEFAULT 1
+);
+GO
+
+INSERT INTO Usuarios (NombreUsuario, Email, Contrasenia, EsAdmin)
+VALUES ('admin', 'mikolajewski.04@gmail.com', '1234', 1);
+GO

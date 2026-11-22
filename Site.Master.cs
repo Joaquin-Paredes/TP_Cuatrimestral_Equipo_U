@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
@@ -11,7 +9,14 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+           
+            if (Session["Usuario"] == null)
+            {
+               
+                Response.Redirect("~/Login.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
         }
     }
 }

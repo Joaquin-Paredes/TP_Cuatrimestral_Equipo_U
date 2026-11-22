@@ -71,20 +71,34 @@
         <asp:GridView ID="dgvCompras" runat="server"
             CssClass="table table-striped table-bordered"
             AutoGenerateColumns="False"
+            OnSelectedIndexChanged="dgvCompras_SelectedIndexChanged"
             ShowHeaderWhenEmpty="True"
             EmptyDataText="No hay compras para mostrar.">
 
             <Columns>
+                <asp:CommandField ShowSelectButton="True" SelectText="Ver detalle" HeaderText="Acción" ControlStyle-CssClass="btn btn-sm btn-outline-primary" />
                 <asp:BoundField DataField="NumeroCompra" HeaderText="N° Compra" />
                 <asp:BoundField DataField="Fecha" HeaderText="Fecha" />
-                <asp:BoundField DataField="Proveedor" HeaderText="Proveedor" />
-                <asp:BoundField DataField="Producto" HeaderText="Producto" />
+                <asp:BoundField DataField="ProveedorNombre" HeaderText="Proveedor" />
+                <asp:BoundField DataField="ProductoNombre" HeaderText="Producto" />
                 <asp:BoundField DataField="Cantidad" HeaderText="Cantidad" />
                 <asp:BoundField DataField="PrecioUnitario" HeaderText="Precio Unitario" />
                 <asp:BoundField DataField="Total" HeaderText="Total" />
             </Columns>
 
         </asp:GridView>
+        <asp:Panel ID="pnlDetalleCompra" runat="server" Visible="false" CssClass="card p-4 mt-4">
+            <h4>Detalle de Compra</h4>
+            <hr />
+            <div class="row">
+                <div class="col-md-4 mb-2"><strong>N° Compra:</strong> <asp:Label ID="lblDetNumero" runat="server" /></div>
+                <div class="col-md-4 mb-2"><strong>Fecha:</strong> <asp:Label ID="lblDetFecha" runat="server" /></div>
+                <div class="col-md-4 mb-2"><strong>Proveedor:</strong> <asp:Label ID="lblDetProveedor" runat="server" /></div>
+                <div class="col-md-4 mb-2"><strong>Producto:</strong> <asp:Label ID="lblDetProducto" runat="server" /></div>
+                <div class="col-md-4 mb-2"><strong>Cantidad:</strong> <asp:Label ID="lblDetCantidad" runat="server" /></div>
+                <div class="col-md-4 mb-2"><strong>Total:</strong> <asp:Label ID="lblDetTotal" runat="server" /></div>
+            </div>
+        </asp:Panel>
 
     </main>
 

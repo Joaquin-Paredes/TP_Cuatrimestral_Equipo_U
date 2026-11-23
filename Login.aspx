@@ -1,5 +1,4 @@
-﻿
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Login" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Login" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -111,51 +110,84 @@
 
 <body>
     <form id="form1" runat="server">
-
         <div class="login-container">
 
-            <div class="logo">
-                <h1>Gestión Comercio</h1>
-                <p>Ingresá a tu cuenta para continuar</p>
-            </div>
+            <asp:Panel ID="pnlLogin" runat="server">
+                <div class="logo">
+                    <h1>Gestión Comercio</h1>
+                    <p>Ingresá a tu cuenta para continuar</p>
+                </div>
 
-            <div class="form-group">
-                <label>Correo Electrónico</label>
-                <asp:TextBox ID="txtEmail" runat="server"
-                    CssClass="form-control"
-                    TextMode="Email"
-                    placeholder="Ingrese su correo electrónico">
-                </asp:TextBox>
-            </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <asp:TextBox ID="txtEmail" runat="server"
+                        CssClass="form-control"
+                        TextMode="Email"
+                        placeholder="Ingrese su correo electrónico">
+                    </asp:TextBox>
+                </div>
 
-            <div class="form-group">
-                <label>Contraseña</label>
-                <asp:TextBox ID="txtContrasena" runat="server"
-                    CssClass="form-control"
-                    TextMode="Password"
-                    placeholder="Ingrese su contraseña">
-                </asp:TextBox>
-            </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <asp:TextBox ID="txtContrasena" runat="server"
+                        CssClass="form-control"
+                        TextMode="Password"
+                        placeholder="Ingrese su contraseña">
+                    </asp:TextBox>
+                </div>
 
-            <asp:Button ID="btnIniciarSesion" runat="server"
-                Text="Iniciar Sesión"
-                CssClass="btn-login" 
-                OnClick="btnIniciarSesion_Click" />
+                <asp:Button ID="btnIniciarSesion" runat="server"
+                    Text="Iniciar Sesión"
+                    CssClass="btn-login" 
+                    OnClick="btnIniciarSesion_Click" />
 
-            <div style="margin-top: 12px; min-height: 40px; text-align: center;">
-                <asp:Label ID="lblMensaje" runat="server" ForeColor="#c62828" Font-Bold="true"></asp:Label>
-            </div>
+                <div style="margin-top: 12px; min-height: 20px; text-align: center;">
+                    <asp:Label ID="lblMensaje" runat="server" ForeColor="#c62828" Font-Bold="true"></asp:Label>
+                </div>
 
-            <div class="register-link">
-                ¿No tenés una cuenta?
-                <asp:HyperLink ID="lnkRegistro" runat="server"
-                    NavigateUrl="~/Registro.aspx"
-                    Text="Crear cuenta">
-                </asp:HyperLink>
-            </div>
+                <div class="register-link" style="margin-top: 10px;">
+                    <asp:LinkButton ID="btnMostrarRecuperar" runat="server" OnClick="btnMostrarRecuperar_Click">¿Olvidaste tu contraseña?</asp:LinkButton>
+                </div>
+
+                <div class="register-link">
+                    ¿No tenés una cuenta?
+                    <asp:HyperLink ID="lnkRegistro" runat="server"
+                        NavigateUrl="~/Registro.aspx"
+                        Text="Crear cuenta">
+                    </asp:HyperLink>
+                </div>
+            </asp:Panel>
+
+            <asp:Panel ID="pnlRecuperar" runat="server" Visible="false">
+                <div class="logo">
+                    <h1>Recuperar Contraseña</h1>
+                    <p>Ingresá tu correo para buscar tu clave</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <asp:TextBox ID="txtEmailRecuperar" runat="server"
+                        CssClass="form-control"
+                        TextMode="Email"
+                        placeholder="Ingrese su correo registrado">
+                    </asp:TextBox>
+                </div>
+
+                <asp:Button ID="btnRecuperar" runat="server"
+                    Text="Buscar Contraseña"
+                    CssClass="btn-login" 
+                    OnClick="btnRecuperar_Click" />
+
+                <div style="margin-top: 15px; min-height: 40px; text-align: center;">
+                    <asp:Label ID="lblMensajeRecuperar" runat="server" Font-Bold="true"></asp:Label>
+                </div>
+
+                <div class="register-link">
+                    <asp:LinkButton ID="btnVolverLogin" runat="server" OnClick="btnVolverLogin_Click">Volver al inicio de sesión</asp:LinkButton>
+                </div>
+            </asp:Panel>
 
         </div>
-
     </form>
 </body>
 </html>

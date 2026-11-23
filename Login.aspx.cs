@@ -1,12 +1,7 @@
 ﻿using Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Dominio;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
@@ -29,12 +24,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
-
-            
-            string query = @"
-                SELECT Id, NombreUsuario, Contrasenia, EsAdmin
-                FROM Usuarios
-                WHERE Email = @Email AND Contrasenia = @Contrasenia";
+            string query = "SELECT Id, NombreUsuario, Contrasenia, EsAdmin FROM Usuarios WHERE Email = @Email AND Contrasenia = @Contrasenia";
 
             try
             {
@@ -49,13 +39,16 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     {
                         if (reader.Read())
                         {
-                            Usuario usuarioLogueado = new Usuario
+                            Usuario usuarioLogueado = new Usuario();
+                            usuarioLogueado.Id = Convert.ToInt32(reader["Id"]);
+                            usuarioLogueado.NombreUsuario = reader["NombreUsuario"].ToString();
+                            usuarioLogueado.Contrasenia = reader["Contrasenia"].ToString();
+                            usuarioLogueado.EsAdmin = false;
+
+                            if (reader["EsAdmin"] != DBNull.Value)
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                NombreUsuario = reader["NombreUsuario"].ToString(),
-                                Contrasenia = reader["Contrasenia"].ToString(),
-                                EsAdmin = reader["EsAdmin"] != DBNull.Value && Convert.ToBoolean(reader["EsAdmin"])
-                            };
+                                usuarioLogueado.EsAdmin = Convert.ToBoolean(reader["EsAdmin"]);
+                            }
 
                             Session["Usuario"] = usuarioLogueado;
                             Response.Redirect("~/Default.aspx", false);
@@ -73,6 +66,67 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 lblMensaje.Text = "Error al iniciar sesión: " + ex.Message;
             }
         }
+
+        protected void btnMostrarRecuperar_Click(object sender, EventArgs e)
+        {
+            pnlLogin.Visible = false;
+            pnlRecuperar.Visible = true;
+            lblMensajeRecuperar.Text = "";
+            txtEmailRecuperar.Text = "";
+        }
+
+        protected void btnVolverLogin_Click(object sender, EventArgs e)
+        {
+            pnlLogin.Visible = true;
+            pnlRecuperar.Visible = false;
+            lblMensaje.Text = "";
+            txtEmail.Text = "";
+            txtContrasena.Text = "";
+        }
+
+        protected void btnRecuperar_Click(object sender, EventArgs e)
+        {
+            string correo = txtEmailRecuperar.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(correo))
+            {
+                lblMensajeRecuperar.Text = "Ingresá un correo electrónico.";
+                lblMensajeRecuperar.ForeColor = System.Drawing.Color.Red;
+                return;
+            }
+
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+            string query = "SELECT Contrasenia FROM Usuarios WHERE Email = @Email";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Email", correo);
+
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string claveEncontrada = reader["Contrasenia"].ToString();
+                            lblMensajeRecuperar.Text = "Tu contraseña es: " + claveEncontrada;
+                            lblMensajeRecuperar.ForeColor = System.Drawing.Color.Green;
+                        }
+                        else
+                        {
+                            lblMensajeRecuperar.Text = "El correo no está registrado.";
+                            lblMensajeRecuperar.ForeColor = System.Drawing.Color.Red;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                lblMensajeRecuperar.Text = "Error al buscar: " + ex.Message;
+                lblMensajeRecuperar.ForeColor = System.Drawing.Color.Red;
+            }
+        }
     }
 }
-    

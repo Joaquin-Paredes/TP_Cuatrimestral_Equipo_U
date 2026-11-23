@@ -75,9 +75,6 @@ CREATE TABLE DetalleVenta (
 );
 GO
 
-USE GestionComercioDB;
-GO
-
 CREATE TABLE Usuarios (
     Id INT PRIMARY KEY IDENTITY(1,1),
     NombreUsuario VARCHAR(100) NOT NULL,

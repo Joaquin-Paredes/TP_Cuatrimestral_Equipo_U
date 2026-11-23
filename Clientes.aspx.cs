@@ -37,10 +37,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         Direccion AS Domicilio
                     FROM dbo.Clientes
                     WHERE Estado = @Estado
+                    AND (@Nombre = '' OR NombreCompleto LIKE '%' + @Nombre + '%')
                     ORDER BY NombreCompleto";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
+                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 100).Value = txtBuscarNombreDinamico.Text.Trim();
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -52,7 +54,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-     
+        protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
+        {
+            CargarGrilla();
+        }
+
+
         protected void dgvClientes_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (dgvClientes.SelectedDataKey == null)
@@ -350,6 +357,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             txtEmail.Text = "";
             txtTelefono.Text = "";
             txtDomicilio.Text = "";
+            txtBuscarNombreDinamico.Text = "";
 
             dgvClientes.SelectedIndex = -1;
         }

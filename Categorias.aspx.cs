@@ -33,11 +33,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     SELECT Codigo, Nombre, Descripcion
                     FROM dbo.Categorias
                     WHERE Estado = @Estado
+                    AND (@Nombre = '' OR Nombre LIKE '%' + @Nombre + '%')
                     ORDER BY Nombre";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
                 cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
+                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 50).Value = txtBuscarNombreDinamico.Text.Trim();
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
 
@@ -48,8 +50,11 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 dgvCategorias.DataBind();
             }
         }
+        protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
+        {
+            CargarGrilla();
+        }
 
-     
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text) ||
@@ -216,7 +221,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
         protected void chkVerInactivos_CheckedChanged(object sender, EventArgs e)
         {
-            LimpiarCampos();
+            LimpiarCampos(); txtDescripcion.Text = "";
             CargarGrilla();
         }
 
@@ -285,6 +290,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             txtNombreCategoria.Text = "";
             txtDescripcion.Text = "";
+            txtBuscarNombreDinamico.Text = "";
 
             dgvCategorias.SelectedIndex = -1;
         }

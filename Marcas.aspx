@@ -36,14 +36,24 @@
             </div>
 
         </div>
-
+        
         <h4>Listado de Marcas</h4>
+
+        <div class="mb-3">
+    <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
+        ClientIDMode="Static"
+        CssClass="form-control"
+        placeholder="Buscar por nombre..."
+        AutoPostBack="true"
+        OnTextChanged="txtBuscarNombreDinamico_TextChanged"
+        onkeydown="guardarScroll()" />
+</div>
 
         <asp:GridView ID="dgvMarcas" runat="server"
             CssClass="table table-striped table-bordered"
             AutoGenerateColumns="False"
             DataKeyNames="Codigo"
-            OnSelectedIndexChanged="dgvMarcas_SelectedIndexChanged"
+            OnSelectedIndexChanged="dgvMarcas_SelectedIndexChanged" 
             EmptyDataText="No hay marcas para mostrar.">
             <Columns>
                 <asp:BoundField DataField="Codigo" HeaderText="Código" />
@@ -53,5 +63,19 @@
         </asp:GridView>
 
     </main>
+
+    <script>
+    function guardarScroll() {
+        sessionStorage.setItem("scrollMarcas", window.scrollY);
+    }
+
+    window.addEventListener("load", function () {
+        const pos = sessionStorage.getItem("scrollMarcas");
+        if (pos !== null) {
+            window.scrollTo(0, parseInt(pos, 10));
+            sessionStorage.removeItem("scrollMarcas");
+        }
+    });
+</script>
 
 </asp:Content>

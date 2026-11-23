@@ -68,6 +68,16 @@
 
         <h4>Listado de Proveedores</h4>
 
+        <div class="mb-3">
+    <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
+        ClientIDMode="Static"
+        CssClass="form-control"
+        placeholder="Buscar por razón social..."
+        AutoPostBack="true"
+        OnTextChanged="txtBuscarNombreDinamico_TextChanged"
+        onkeydown="guardarScroll()" />
+</div>
+
         <asp:GridView ID="dgvProveedores" runat="server"
             CssClass="table table-striped table-bordered"
             AutoGenerateColumns="False"
@@ -87,5 +97,19 @@
         </asp:GridView>
 
     </main>
+
+    <script>
+    function guardarScroll() {
+        sessionStorage.setItem("scrollProveedores", window.scrollY);
+    }
+
+    window.addEventListener("load", function () {
+        const pos = sessionStorage.getItem("scrollProveedores");
+        if (pos !== null) {
+            window.scrollTo(0, parseInt(pos, 10));
+            sessionStorage.removeItem("scrollProveedores");
+        }
+    });
+</script>
 
 </asp:Content>

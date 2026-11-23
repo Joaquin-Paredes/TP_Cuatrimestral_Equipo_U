@@ -91,6 +91,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         P.Estado = @Estado AND
                         M.Estado = 1 AND
                         C.Estado = 1 AND
+                        (@NombreDinamico = '' OR P.Nombre LIKE '%' + @NombreDinamico + '%') AND
                         (@Texto = '' OR P.Codigo LIKE '%' + @Texto + '%'
                         OR P.Nombre LIKE '%' + @Texto + '%')
                         AND (@MarcaCodigo = '' OR P.MarcaCodigo = @MarcaCodigo)
@@ -100,6 +101,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 SqlCommand cmd = new SqlCommand(query, conn);
 
                 cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
+
+                cmd.Parameters.Add("@NombreDinamico", SqlDbType.VarChar, 100).Value =
+                txtBuscarNombreDinamico.Text.Trim();
 
                 cmd.Parameters.Add("@Texto", SqlDbType.VarChar, 120).Value =
                     txtBuscar.Text.Trim();
@@ -120,6 +124,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+        protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
+        {
+            OcultarDetalle();
+            CargarGrilla();
+        }
+
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
             OcultarDetalle();
@@ -129,6 +139,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
         {
             txtBuscar.Text = "";
+            txtBuscarNombreDinamico.Text = "";
 
             ddlFiltroMarca.SelectedIndex = 0;
             ddlFiltroCategoria.SelectedIndex = 0;

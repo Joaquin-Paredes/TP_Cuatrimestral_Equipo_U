@@ -34,13 +34,16 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     Email,
                     Direccion
                 FROM Proveedores 
-                WHERE Estado = @Estado AND (@CUIT = '' OR CUIT LIKE '%' + @CUIT + '%')
+                WHERE Estado = @Estado
+                AND (@CUIT = '' OR CUIT LIKE '%' + @CUIT + '%')
+                AND (@RazonSocial = '' OR RazonSocial LIKE '%' + @RazonSocial + '%')
                 ORDER BY RazonSocial";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
                 cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
                 cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value = cuit.Trim();
+                cmd.Parameters.Add("@RazonSocial", SqlDbType.VarChar, 100).Value = txtBuscarNombreDinamico.Text.Trim();
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
 
@@ -52,6 +55,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+        protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
+        {
+            CargarGrilla(txtBuscarCuit.Text.Trim());
+        }
 
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
@@ -129,6 +136,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         protected void btnLimpiarBusqueda_Click(object sender, EventArgs e)
         {
             txtBuscarCuit.Text = "";
+            txtBuscarNombreDinamico.Text = "";
 
             LimpiarControles();
 
@@ -397,6 +405,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             txtEmail.Text = "";
             txtTelefono.Text = "";
             txtDireccion.Text = "";
+            txtBuscarNombreDinamico.Text = "";
 
             dgvProveedores.SelectedIndex = -1;
         }

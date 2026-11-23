@@ -50,6 +50,16 @@
 
         <h4>Listado de Categorías</h4>
 
+        <div class="mb-3">
+    <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
+        ClientIDMode="Static"
+        CssClass="form-control"
+        placeholder="Buscar por nombre..."
+        AutoPostBack="true"
+        OnTextChanged="txtBuscarNombreDinamico_TextChanged"
+        onkeydown="guardarScroll()" />
+</div>
+
         <asp:GridView ID="dgvCategorias" runat="server"
             CssClass="table table-striped table-bordered"
             AutoGenerateColumns="False"
@@ -68,5 +78,20 @@
         </asp:GridView>
 
     </main>
+
+    <script>
+
+    function guardarScroll() {
+        sessionStorage.setItem("scrollCategorias", window.scrollY);
+    }
+
+    window.addEventListener("load", function () {
+        const pos = sessionStorage.getItem("scrollCategorias");
+        if (pos !== null) {
+            window.scrollTo(0, parseInt(pos, 10));
+            sessionStorage.removeItem("scrollCategorias");
+        }
+    });
+</script>
 
 </asp:Content>

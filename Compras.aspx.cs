@@ -46,8 +46,25 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         }
         private void CargarGrilla()
         {
-            dgvCompras.DataSource = ObtenerCompras();
+
+            string filtro = txtBuscarNombreDinamico.Text.Trim();
+            var lista = ObtenerCompras();
+
+            if (!string.IsNullOrEmpty(filtro))
+            {
+                lista = lista.Where(c =>
+                    (!string.IsNullOrEmpty(c.ProveedorNombre) && c.ProveedorNombre.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (!string.IsNullOrEmpty(c.ProductoNombre) && c.ProductoNombre.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0)
+                ).ToList();
+            }
+
+            dgvCompras.DataSource = lista;
             dgvCompras.DataBind();
+        }
+
+        protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
+        {
+            CargarGrilla();
         }
 
         protected void dgvCompras_SelectedIndexChanged(object sender, EventArgs e)

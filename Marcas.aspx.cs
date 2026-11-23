@@ -18,12 +18,18 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("SELECT Codigo, Nombre FROM Marcas WHERE Estado = @Estado", conn);
+                SqlCommand cmd = new SqlCommand(
+                "SELECT Codigo, Nombre FROM Marcas WHERE Estado = @Estado AND (@Nombre = '' OR Nombre LIKE '%' + @Nombre + '%') ORDER BY Nombre", conn);
                 cmd.Parameters.AddWithValue("@Estado", estado);
+                cmd.Parameters.AddWithValue("@Nombre", txtBuscarNombreDinamico.Text.Trim());
                 conn.Open();
                 dgvMarcas.DataSource = cmd.ExecuteReader();
                 dgvMarcas.DataBind();
             }
+        }
+        protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
+        {
+            CargarGrilla();
         }
 
         protected void dgvMarcas_SelectedIndexChanged(object sender, EventArgs e)
@@ -177,6 +183,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             txtCodigoMarca.Text = "";
             txtCodigoMarca.ReadOnly = false;
             txtNombreMarca.Text = "";
+            txtBuscarNombreDinamico.Text = "";
             dgvMarcas.SelectedIndex = -1;
         }
 

@@ -20,12 +20,22 @@
                     <label class="form-label">Código de Categoría</label>
                     <asp:TextBox ID="txtCodigoCategoria" runat="server"
                         CssClass="form-control" placeholder="Ingrese el código"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvCodigoCategoria" runat="server"
+                        ControlToValidate="txtCodigoCategoria"
+                        ErrorMessage="El código de categoría es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Nombre de Categoría</label>
                     <asp:TextBox ID="txtNombreCategoria" runat="server"
                         CssClass="form-control" placeholder="Ingrese el nombre"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvNombreCategoria" runat="server"
+                        ControlToValidate="txtNombreCategoria"
+                        ErrorMessage="El nombre de categoría es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-12 mb-3">
@@ -40,9 +50,9 @@
             <div class="mt-2 d-flex align-items-center flex-wrap gap-2">
                <asp:Button ID="btnAgregar" runat="server" Text="Agregar" CssClass="btn btn-primary" OnClick="btnAgregar_Click" />
                <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" OnClick="btnModificar_Click" />
-               <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" />
-               <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" />
-               <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
+               <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" CausesValidation="false" />
+               <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" CausesValidation="false" />
+               <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" CausesValidation="false" />
                <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
             </div>
 

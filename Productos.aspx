@@ -23,6 +23,11 @@
                         CssClass="form-control"
                         placeholder="Ingrese el código">
                     </asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvCodigoProducto" runat="server"
+                        ControlToValidate="txtCodigoProducto"
+                        ErrorMessage="El código del producto es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -31,6 +36,11 @@
                         CssClass="form-control"
                         placeholder="Ingrese el nombre">
                     </asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvNombreProducto" runat="server"
+                        ControlToValidate="txtNombreProducto"
+                        ErrorMessage="El nombre del producto es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -53,6 +63,11 @@
                         CssClass="form-control"
                         placeholder="Ingrese el precio">
                     </asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvPrecioProducto" runat="server"
+                        ControlToValidate="txtPrecio"
+                        ErrorMessage="El precio es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -61,6 +76,11 @@
                         CssClass="form-control"
                         placeholder="Ingrese el stock">
                     </asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvStockProducto" runat="server"
+                        ControlToValidate="txtStock"
+                        ErrorMessage="El stock actual es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -69,6 +89,11 @@
                         CssClass="form-control"
                         placeholder="Ingrese el stock mínimo">
                     </asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvStockMinimoProducto" runat="server"
+                        ControlToValidate="txtStockMinimo"
+                        ErrorMessage="El stock mínimo es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
             </div>

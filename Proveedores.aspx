@@ -36,11 +36,21 @@
                         ErrorMessage="El CUIT debe contener solo números."
                         CssClass="text-danger small"
                         Display="Dynamic" />
+                    <asp:RequiredFieldValidator ID="rfvCuitProveedor" runat="server"
+                        ControlToValidate="txtCUIT"
+                        ErrorMessage="El CUIT es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Razón Social</label>
                     <asp:TextBox ID="txtRazonSocial" runat="server" CssClass="form-control" placeholder="Ingrese la razón social"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvRazonSocialProveedor" runat="server"
+                        ControlToValidate="txtRazonSocial"
+                        ErrorMessage="La razón social es obligatoria."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">

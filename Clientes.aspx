@@ -25,12 +25,25 @@
                         ErrorMessage="El CUIT debe contener solo números."
                         CssClass="text-danger small"
                         Display="Dynamic" />
+
+                    <asp:RequiredFieldValidator ID="rfvCuitCliente" runat="server"
+                        ControlToValidate="txtCodigoCliente"
+                        ErrorMessage="El CUIT es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
+
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Nombre Completo</label>
                     <asp:TextBox ID="txtNombre" runat="server"
                         CssClass="form-control" placeholder="Ingrese nombre y apellido" />
+
+                    <asp:RequiredFieldValidator ID="rfvNombreCliente" runat="server"
+                        ControlToValidate="txtNombre"
+                        ErrorMessage="El nombre completo es obligatorio."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-6 mb-3">

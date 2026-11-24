@@ -14,8 +14,8 @@
                     <asp:TextBox ID="txtBuscarCuit" runat="server" CssClass="form-control" placeholder="Ingrese el CUIT a buscar"></asp:TextBox>
                 </div>
                 <div class="col-md-7 mb-2">
-                    <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn btn-primary me-2" OnClick="btnBuscar_Click" />
-                    <asp:Button ID="btnLimpiarBusqueda" runat="server" Text="Mostrar Todos" CssClass="btn btn-outline-secondary" OnClick="btnLimpiarBusqueda_Click" />
+                    <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn btn-primary me-2" OnClick="btnBuscar_Click" CausesValidation="false" />
+                    <asp:Button ID="btnLimpiarBusqueda" runat="server" Text="Mostrar Todos" CssClass="btn btn-outline-secondary" OnClick="btnLimpiarBusqueda_Click" CausesValidation="false" />
                 </div>
                 <div class="col-12 mt-3">
                     <asp:CheckBox ID="chkVerInactivos" runat="server" Text=" Mostrar proveedores eliminados" AutoPostBack="true" CssClass="form-check-label fw-bold text-danger" OnCheckedChanged="chkVerInactivos_CheckedChanged" />
@@ -30,6 +30,12 @@
                 <div class="col-md-4 mb-3">
                     <label class="form-label">CUIT</label>
                     <asp:TextBox ID="txtCUIT" runat="server" CssClass="form-control" placeholder="Ingrese el CUIT"></asp:TextBox>
+                    <asp:RegularExpressionValidator ID="revCuitProveedor" runat="server"
+                        ControlToValidate="txtCUIT"
+                        ValidationExpression="^[0-9]+$"
+                        ErrorMessage="El CUIT debe contener solo números."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -45,6 +51,12 @@
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Correo Electrónico</label>
                     <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="Ingrese el correo"></asp:TextBox>
+                    <asp:RegularExpressionValidator ID="revEmailProveedor" runat="server"
+                        ControlToValidate="txtEmail"
+                        ValidationExpression="^\S+@\S+\.\S+$"
+                        ErrorMessage="Ingrese un correo electrónico válido."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -56,11 +68,11 @@
             <div class="mt-2 d-flex align-items-center flex-wrap gap-2">
                 <asp:Button ID="btnAgregar" runat="server" Text="Agregar" CssClass="btn btn-primary" OnClick="btnAgregar_Click" />
                 <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" OnClick="btnModificar_Click" />
-                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" />
+                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" CausesValidation="false" />
                 
-                <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" />
+                <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" CausesValidation="false" />
                 
-                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
+                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" CausesValidation="false" />
                 
                 <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
             </div>
@@ -69,14 +81,14 @@
         <h4>Listado de Proveedores</h4>
 
         <div class="mb-3">
-    <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
-        ClientIDMode="Static"
-        CssClass="form-control"
-        placeholder="Buscar por razón social..."
-        AutoPostBack="true"
-        OnTextChanged="txtBuscarNombreDinamico_TextChanged"
-        onkeydown="guardarScroll()" />
-</div>
+            <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
+                ClientIDMode="Static"
+                CssClass="form-control"
+                placeholder="Buscar por razón social..."
+                AutoPostBack="true"
+                OnTextChanged="txtBuscarNombreDinamico_TextChanged"
+                onkeydown="guardarScroll()" />
+        </div>
 
         <asp:GridView ID="dgvProveedores" runat="server"
             CssClass="table table-striped table-bordered"
@@ -99,17 +111,17 @@
     </main>
 
     <script>
-    function guardarScroll() {
-        sessionStorage.setItem("scrollProveedores", window.scrollY);
-    }
+function guardarScroll() {
+    sessionStorage.setItem("scrollProveedores", window.scrollY);
+}
 
-    window.addEventListener("load", function () {
-        const pos = sessionStorage.getItem("scrollProveedores");
-        if (pos !== null) {
-            window.scrollTo(0, parseInt(pos, 10));
-            sessionStorage.removeItem("scrollProveedores");
-        }
-    });
+window.addEventListener("load", function () {
+    const pos = sessionStorage.getItem("scrollProveedores");
+    if (pos !== null) {
+        window.scrollTo(0, parseInt(pos, 10));
+        sessionStorage.removeItem("scrollProveedores");
+    }
+});
 </script>
 
 </asp:Content>

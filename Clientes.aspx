@@ -19,6 +19,12 @@
                     <label class="form-label">CUIT</label>
                     <asp:TextBox ID="txtCodigoCliente" runat="server"
                         CssClass="form-control" placeholder="Ingrese el CUIT" />
+                    <asp:RegularExpressionValidator ID="revCuitCliente" runat="server"
+                        ControlToValidate="txtCodigoCliente"
+                        ValidationExpression="^[0-9]+$"
+                        ErrorMessage="El CUIT debe contener solo números."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-6 mb-3">
@@ -31,6 +37,12 @@
                     <label class="form-label">Correo Electrónico</label>
                     <asp:TextBox ID="txtEmail" runat="server"
                         CssClass="form-control" placeholder="Ingrese el correo" />
+                    <asp:RegularExpressionValidator ID="revEmailCliente" runat="server"
+                        ControlToValidate="txtEmail"
+                        ValidationExpression="^\S+@\S+\.\S+$"
+                        ErrorMessage="Ingrese un correo electrónico válido."
+                        CssClass="text-danger small"
+                        Display="Dynamic" />
                 </div>
 
                 <div class="col-md-6 mb-3">
@@ -80,15 +92,14 @@
         <h4>Listado de Clientes</h4>
 
         <div class="mb-3">
-    <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
-        ClientIDMode="Static"
-        CssClass="form-control"
-        placeholder="Buscar por nombre..."
-        AutoPostBack="true"
-        OnTextChanged="txtBuscarNombreDinamico_TextChanged"
-        onkeydown="guardarScroll()" />
-</div>
-
+            <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
+                ClientIDMode="Static"
+                CssClass="form-control"
+                placeholder="Buscar por nombre..."
+                AutoPostBack="true"
+                OnTextChanged="txtBuscarNombreDinamico_TextChanged"
+                onkeydown="guardarScroll()" />
+        </div>
 
         <div class="table-responsive">
 
@@ -120,17 +131,17 @@
     </main>
 
     <script>
-    function guardarScroll() {
-        sessionStorage.setItem("scrollClientes", window.scrollY);
-    }
+function guardarScroll() {
+    sessionStorage.setItem("scrollClientes", window.scrollY);
+}
 
-    window.addEventListener("load", function () {
-        const pos = sessionStorage.getItem("scrollClientes");
-        if (pos !== null) {
-            window.scrollTo(0, parseInt(pos, 10));
-            sessionStorage.removeItem("scrollClientes");
-        }
-    });
+window.addEventListener("load", function () {
+    const pos = sessionStorage.getItem("scrollClientes");
+    if (pos !== null) {
+        window.scrollTo(0, parseInt(pos, 10));
+        sessionStorage.removeItem("scrollClientes");
+    }
+});
 </script>
 
 </asp:Content>

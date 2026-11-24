@@ -60,6 +60,15 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         protected global::System.Web.UI.WebControls.TextBox txtCUIT;
 
         /// <summary>
+        /// Control revCuitProveedor.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revCuitProveedor;
+
+        /// <summary>
         /// Control txtRazonSocial.
         /// </summary>
         /// <remarks>
@@ -85,6 +94,15 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtEmail;
+
+        /// <summary>
+        /// Control revEmailProveedor.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revEmailProveedor;
 
         /// <summary>
         /// Control txtDireccion.

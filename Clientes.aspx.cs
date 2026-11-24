@@ -117,6 +117,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
   
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
+            Page.Validate();
+            if (!Page.IsValid)
+                return;
+
             if (!ValidarCliente())
                 return;
 
@@ -177,6 +181,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
       
         protected void btnModificar_Click(object sender, EventArgs e)
         {
+            Page.Validate();
+            if (!Page.IsValid)
+                return;
+
             if (!ValidarCliente())
                 return;
 

@@ -55,8 +55,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             CargarGrilla();
         }
 
+
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
+            // VALIDAR CAMPOS
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text) ||
                 string.IsNullOrWhiteSpace(txtNombreCategoria.Text))
             {
@@ -68,38 +70,60 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = @"
-                    INSERT INTO dbo.Categorias
-                    (Codigo, Nombre, Descripcion, Estado)
-                    VALUES
-                    (@Codigo, @Nombre, @Desc, 1)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
-                    txtCodigoCategoria.Text.Trim();
-
-                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 50).Value =
-                    txtNombreCategoria.Text.Trim();
-
-                cmd.Parameters.Add("@Desc", SqlDbType.VarChar, 250).Value =
-                    string.IsNullOrWhiteSpace(txtDescripcion.Text)
-                    ? (object)DBNull.Value : txtDescripcion.Text.Trim();
-
                 try
                 {
                     conn.Open();
+
+                    // COMPROBAR SI EL CODIGO YA EXISTE
+                    string consulta = @"
+                SELECT COUNT(1)
+                FROM dbo.Categorias
+                WHERE Codigo = @Codigo";
+
+                    SqlCommand cmdExiste = new SqlCommand(consulta, conn);
+
+                    cmdExiste.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
+                        txtCodigoCategoria.Text.Trim();
+
+                    int cantidad = Convert.ToInt32(cmdExiste.ExecuteScalar());
+
+                    if (cantidad > 0)
+                    {
+                        MostrarMensaje("Ya existe una categoría registrada con ese código.", false);
+                        return;
+                    }
+
+                    // INSERTAR CATEGORIA SI EL CODIGO NO EXISTE
+                    string query = @"
+                INSERT INTO dbo.Categorias
+                (Codigo, Nombre, Descripcion, Estado)
+                VALUES
+                (@Codigo, @Nombre, @Desc, 1)";
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
+                        txtCodigoCategoria.Text.Trim();
+
+                    cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 50).Value =
+                        txtNombreCategoria.Text.Trim();
+
+                    cmd.Parameters.Add("@Desc", SqlDbType.VarChar, 250).Value =
+                        string.IsNullOrWhiteSpace(txtDescripcion.Text)
+                        ? (object)DBNull.Value : txtDescripcion.Text.Trim();
+
                     cmd.ExecuteNonQuery();
 
                     MostrarMensaje("Categoría agregada correctamente.", true);
 
                     LimpiarCampos();
+                    CargarGrilla();
                 }
                 catch (SqlException ex)
                 {
                     if (ex.Number == 2627 || ex.Number == 2601)
                     {
-                        MostrarMensaje("Ya existe una categoría con ese código.", false);
+                        MostrarMensaje("Ya existe una categoría registrada con ese código.", false);
                     }
                     else
                     {
@@ -107,11 +131,10 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     }
                 }
             }
-
-            CargarGrilla();
         }
 
-      
+
+
         protected void btnModificar_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text) ||

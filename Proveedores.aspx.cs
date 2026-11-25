@@ -178,9 +178,11 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         }
 
 
+
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             Page.Validate();
+
             if (!Page.IsValid)
                 return;
 
@@ -191,35 +193,56 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = @"
-                    INSERT INTO Proveedores
-                    (CUIT, RazonSocial, Email, Telefono, Direccion)
-                    VALUES
-                    (@CUIT, @RazonSocial, @Email, @Telefono, @Direccion)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
-                    txtCUIT.Text.Trim();
-
-                cmd.Parameters.Add("@RazonSocial", SqlDbType.VarChar, 100).Value =
-                    txtRazonSocial.Text.Trim();
-
-                cmd.Parameters.Add("@Email", SqlDbType.VarChar, 100).Value =
-                    string.IsNullOrWhiteSpace(txtEmail.Text)
-                    ? (object)DBNull.Value : txtEmail.Text.Trim();
-
-                cmd.Parameters.Add("@Telefono", SqlDbType.VarChar, 20).Value =
-                    string.IsNullOrWhiteSpace(txtTelefono.Text)
-                    ? (object)DBNull.Value : txtTelefono.Text.Trim();
-
-                cmd.Parameters.Add("@Direccion", SqlDbType.VarChar, 150).Value =
-                    string.IsNullOrWhiteSpace(txtDireccion.Text)
-                    ? (object)DBNull.Value : txtDireccion.Text.Trim();
-
                 try
                 {
                     conn.Open();
+
+               
+                    string consulta = @"
+                SELECT COUNT(1)
+                FROM dbo.Proveedores
+                WHERE CUIT = @CUIT";
+
+                    SqlCommand cmdExiste = new SqlCommand(consulta, conn);
+
+                    cmdExiste.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
+                        txtCUIT.Text.Trim();
+
+                    int cantidad = Convert.ToInt32(cmdExiste.ExecuteScalar());
+
+                    if (cantidad > 0)
+                    {
+                        MostrarMensaje("Ya existe un proveedor registrado con ese CUIT.", false);
+                        return;
+                    }
+
+                  
+                    string query = @"
+                INSERT INTO dbo.Proveedores
+                (CUIT, RazonSocial, Email, Telefono, Direccion)
+                VALUES
+                (@CUIT, @RazonSocial, @Email, @Telefono, @Direccion)";
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
+                        txtCUIT.Text.Trim();
+
+                    cmd.Parameters.Add("@RazonSocial", SqlDbType.VarChar, 100).Value =
+                        txtRazonSocial.Text.Trim();
+
+                    cmd.Parameters.Add("@Email", SqlDbType.VarChar, 100).Value =
+                        string.IsNullOrWhiteSpace(txtEmail.Text)
+                        ? (object)DBNull.Value : txtEmail.Text.Trim();
+
+                    cmd.Parameters.Add("@Telefono", SqlDbType.VarChar, 20).Value =
+                        string.IsNullOrWhiteSpace(txtTelefono.Text)
+                        ? (object)DBNull.Value : txtTelefono.Text.Trim();
+
+                    cmd.Parameters.Add("@Direccion", SqlDbType.VarChar, 150).Value =
+                        string.IsNullOrWhiteSpace(txtDireccion.Text)
+                        ? (object)DBNull.Value : txtDireccion.Text.Trim();
+
                     cmd.ExecuteNonQuery();
 
                     MostrarMensaje("Proveedor agregado correctamente.", true);

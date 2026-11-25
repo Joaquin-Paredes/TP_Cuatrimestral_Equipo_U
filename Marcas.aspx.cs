@@ -42,28 +42,83 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
+            // Validar campos
+            if (string.IsNullOrWhiteSpace(txtCodigoMarca.Text))
+            {
+                MostrarMensaje("Debe ingresar el código de la marca.", false);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtNombreMarca.Text))
+            {
+                MostrarMensaje("Debe ingresar el nombre de la marca.", false);
+                return;
+            }
+
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                SqlCommand cmd = new SqlCommand("INSERT INTO Marcas (Codigo, Nombre, Estado) VALUES (@Codigo, @Nombre, 1)", conn);
-                cmd.Parameters.AddWithValue("@Codigo", txtCodigoMarca.Text);
-                cmd.Parameters.AddWithValue("@Nombre", txtNombreMarca.Text);
                 try
                 {
                     conn.Open();
+
+                    // COMPROBAR SI EL CODIGO YA EXISTE
+                    string consulta = @"
+                SELECT COUNT(1)
+                FROM dbo.Marcas
+                WHERE Codigo = @Codigo";
+
+                    SqlCommand cmdExiste = new SqlCommand(consulta, conn);
+
+                    cmdExiste.Parameters.Add("@Codigo", System.Data.SqlDbType.VarChar, 20).Value =
+                        txtCodigoMarca.Text.Trim();
+
+                    int cantidad = Convert.ToInt32(cmdExiste.ExecuteScalar());
+
+                    if (cantidad > 0)
+                    {
+                        MostrarMensaje("Ya existe una marca registrada con ese código.", false);
+                        return;
+                    }
+
+                    // INSERTAR MARCA SI EL CODIGO NO EXISTE
+                    string query = @"
+                INSERT INTO dbo.Marcas (Codigo, Nombre, Estado)
+                VALUES (@Codigo, @Nombre, 1)";
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    cmd.Parameters.Add("@Codigo", System.Data.SqlDbType.VarChar, 20).Value =
+                        txtCodigoMarca.Text.Trim();
+
+                    cmd.Parameters.Add("@Nombre", System.Data.SqlDbType.VarChar, 50).Value =
+                        txtNombreMarca.Text.Trim();
+
                     cmd.ExecuteNonQuery();
+
                     MostrarMensaje("Marca agregada correctamente.", true);
+
                     LimpiarCampos();
+                    CargarGrilla();
                 }
-                catch (Exception)
+                catch (SqlException ex)
                 {
-                    MostrarMensaje("Error al agregar la marca.", false);
+                    if (ex.Number == 2627 || ex.Number == 2601)
+                    {
+                        MostrarMensaje("Ya existe una marca registrada con ese código.", false);
+                    }
+                    else
+                    {
+                        MostrarMensaje("Error al agregar la marca: " + ex.Message, false);
+                    }
                 }
             }
-            CargarGrilla();
         }
+
 
         protected void btnModificar_Click(object sender, EventArgs e)
         {

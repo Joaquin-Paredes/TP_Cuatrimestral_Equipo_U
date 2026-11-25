@@ -279,6 +279,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             return true;
         }
 
+
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             decimal precio;
@@ -295,33 +296,54 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = @"
-                    INSERT INTO Productos
-                    (Codigo, Nombre, Precio, Stock, StockMinimo, MarcaCodigo, CategoriaCodigo)
-                    VALUES
-                    (@Codigo, @Nombre, @Precio, @Stock, @StockMinimo, @MarcaCodigo, @CategoriaCodigo)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 20).Value =
-                    txtCodigoProducto.Text.Trim();
-
-                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 100).Value =
-                    txtNombreProducto.Text.Trim();
-
-                cmd.Parameters.Add("@Precio", SqlDbType.Decimal).Value = precio;
-                cmd.Parameters["@Precio"].Precision = 18;
-                cmd.Parameters["@Precio"].Scale = 2;
-
-                cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = stock;
-                cmd.Parameters.Add("@StockMinimo", SqlDbType.Int).Value = stockMinimo;
-
-                cmd.Parameters.Add("@MarcaCodigo", SqlDbType.VarChar, 20).Value = marcaCodigo;
-                cmd.Parameters.Add("@CategoriaCodigo", SqlDbType.VarChar, 20).Value = categoriaCodigo;
-
                 try
                 {
                     conn.Open();
+
+              
+                    string consulta = @"
+                SELECT COUNT(1)
+                FROM dbo.Productos
+                WHERE Codigo = @Codigo";
+
+                    SqlCommand cmdExiste = new SqlCommand(consulta, conn);
+
+                    cmdExiste.Parameters.Add("@Codigo", SqlDbType.VarChar, 50).Value =
+                        txtCodigoProducto.Text.Trim();
+
+                    int cantidad = Convert.ToInt32(cmdExiste.ExecuteScalar());
+
+                    if (cantidad > 0)
+                    {
+                        MostrarMensaje("Ya existe un producto registrado con ese código.", false);
+                        return;
+                    }
+
+                  
+                    string query = @"
+                INSERT INTO dbo.Productos
+                (Codigo, Nombre, Precio, Stock, StockMinimo, MarcaCodigo, CategoriaCodigo)
+                VALUES
+                (@Codigo, @Nombre, @Precio, @Stock, @StockMinimo, @MarcaCodigo, @CategoriaCodigo)";
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    cmd.Parameters.Add("@Codigo", SqlDbType.VarChar, 50).Value =
+                        txtCodigoProducto.Text.Trim();
+
+                    cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 100).Value =
+                        txtNombreProducto.Text.Trim();
+
+                    cmd.Parameters.Add("@Precio", SqlDbType.Decimal).Value = precio;
+                    cmd.Parameters["@Precio"].Precision = 18;
+                    cmd.Parameters["@Precio"].Scale = 2;
+
+                    cmd.Parameters.Add("@Stock", SqlDbType.Int).Value = stock;
+                    cmd.Parameters.Add("@StockMinimo", SqlDbType.Int).Value = stockMinimo;
+
+                    cmd.Parameters.Add("@MarcaCodigo", SqlDbType.VarChar, 20).Value = marcaCodigo;
+                    cmd.Parameters.Add("@CategoriaCodigo", SqlDbType.VarChar, 20).Value = categoriaCodigo;
+
                     cmd.ExecuteNonQuery();
 
                     MostrarMensaje("Producto agregado correctamente.", true);
@@ -337,11 +359,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                     }
                     else
                     {
-                        MostrarMensaje("Ocurrió un error al agregar el producto.", false);
+                        MostrarMensaje("Error al agregar el producto: " + ex.Message, false);
                     }
                 }
             }
         }
+
 
         protected void btnModificar_Click(object sender, EventArgs e)
         {

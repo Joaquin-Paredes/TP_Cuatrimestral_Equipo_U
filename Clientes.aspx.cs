@@ -115,68 +115,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         }
 
   
-        protected void btnAgregar_Click(object sender, EventArgs e)
-        {
-            Page.Validate();
-            if (!Page.IsValid)
-                return;
 
-            if (!ValidarCliente())
-                return;
-
-            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(connString))
-            {
-                string query = @"
-                    INSERT INTO dbo.Clientes
-                    (CUIT, NombreCompleto, Email, Telefono, Direccion, Estado)
-                    VALUES
-                    (@CUIT, @NombreCompleto, @Email, @Telefono, @Direccion, 1)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
-                    txtCodigoCliente.Text.Trim();
-
-                cmd.Parameters.Add("@NombreCompleto", SqlDbType.VarChar, 100).Value =
-                    txtNombre.Text.Trim();
-
-                cmd.Parameters.Add("@Email", SqlDbType.VarChar, 100).Value =
-                    string.IsNullOrWhiteSpace(txtEmail.Text)
-                    ? (object)DBNull.Value : txtEmail.Text.Trim();
-
-                cmd.Parameters.Add("@Telefono", SqlDbType.VarChar, 20).Value =
-                    string.IsNullOrWhiteSpace(txtTelefono.Text)
-                    ? (object)DBNull.Value : txtTelefono.Text.Trim();
-
-                cmd.Parameters.Add("@Direccion", SqlDbType.VarChar, 150).Value =
-                    string.IsNullOrWhiteSpace(txtDomicilio.Text)
-                    ? (object)DBNull.Value : txtDomicilio.Text.Trim();
-
-                try
-                {
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-
-                    MostrarMensaje("Cliente agregado correctamente.", true);
-
-                    LimpiarControles();
-                    CargarGrilla();
-                }
-                catch (SqlException ex)
-                {
-                    if (ex.Number == 2627 || ex.Number == 2601)
-                    {
-                        MostrarMensaje("Ya existe un cliente registrado con ese CUIT.", false);
-                    }
-                    else
-                    {
-                        MostrarMensaje("Error al agregar el cliente: " + ex.Message, false);
-                    }
-                }
-            }
-        }
 
       
         protected void btnModificar_Click(object sender, EventArgs e)
@@ -349,13 +288,99 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-   
+
+
+        protected void btnAgregar_Click(object sender, EventArgs e)
+        {
+            Page.Validate();
+
+            if (!Page.IsValid)
+                return;
+
+            if (!ValidarCliente())
+                return;
+
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                try
+                {
+                    conn.Open();
+
+        
+                    string consulta = @"
+                SELECT COUNT(1)
+                FROM dbo.Clientes
+                WHERE CUIT = @CUIT";
+
+                    SqlCommand cmdExiste = new SqlCommand(consulta, conn);
+
+                    cmdExiste.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
+                        txtCodigoCliente.Text.Trim();
+
+                    int cantidad = Convert.ToInt32(cmdExiste.ExecuteScalar());
+
+                    if (cantidad > 0)
+                    {
+                        MostrarMensaje("Ya existe un cliente registrado con ese CUIT.", false);
+                        return;
+                    }
+
+                  
+                    string query = @"
+                INSERT INTO dbo.Clientes
+                (CUIT, NombreCompleto, Email, Telefono, Direccion, Estado)
+                VALUES
+                (@CUIT, @NombreCompleto, @Email, @Telefono, @Direccion, 1)";
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    cmd.Parameters.Add("@CUIT", SqlDbType.VarChar, 20).Value =
+                        txtCodigoCliente.Text.Trim();
+
+                    cmd.Parameters.Add("@NombreCompleto", SqlDbType.VarChar, 100).Value =
+                        txtNombre.Text.Trim();
+
+                    cmd.Parameters.Add("@Email", SqlDbType.VarChar, 100).Value =
+                        string.IsNullOrWhiteSpace(txtEmail.Text)
+                        ? (object)DBNull.Value : txtEmail.Text.Trim();
+
+                    cmd.Parameters.Add("@Telefono", SqlDbType.VarChar, 20).Value =
+                        string.IsNullOrWhiteSpace(txtTelefono.Text)
+                        ? (object)DBNull.Value : txtTelefono.Text.Trim();
+
+                    cmd.Parameters.Add("@Direccion", SqlDbType.VarChar, 150).Value =
+                        string.IsNullOrWhiteSpace(txtDomicilio.Text)
+                        ? (object)DBNull.Value : txtDomicilio.Text.Trim();
+
+                    cmd.ExecuteNonQuery();
+
+                    MostrarMensaje("Cliente agregado correctamente.", true);
+
+                    LimpiarControles();
+                    CargarGrilla();
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 2627 || ex.Number == 2601)
+                    {
+                        MostrarMensaje("Ya existe un cliente registrado con ese CUIT.", false);
+                    }
+                    else
+                    {
+                        MostrarMensaje("Error al agregar el cliente: " + ex.Message, false);
+                    }
+                }
+            }
+        }
+     
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarControles();
             MostrarMensaje("", true);
+            CargarGrilla();
         }
-
         private void LimpiarControles()
         {
             txtCodigoCliente.Text = "";

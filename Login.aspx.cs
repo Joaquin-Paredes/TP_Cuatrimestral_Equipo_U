@@ -24,7 +24,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
-            string query = "SELECT Id, NombreUsuario, Contrasenia, EsAdmin FROM Usuarios WHERE Email = @Email AND Contrasenia = @Contrasenia";
+            string query = "SELECT Id, NombreUsuario, Email, Contrasenia, EsAdmin FROM Usuarios WHERE Email = @Email AND Contrasenia = @Contrasenia AND Estado = 1";
 
             try
             {
@@ -42,6 +42,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                             Usuario usuarioLogueado = new Usuario();
                             usuarioLogueado.Id = Convert.ToInt32(reader["Id"]);
                             usuarioLogueado.NombreUsuario = reader["NombreUsuario"].ToString();
+                            usuarioLogueado.Email = reader["Email"].ToString();
                             usuarioLogueado.Contrasenia = reader["Contrasenia"].ToString();
                             usuarioLogueado.EsAdmin = false;
 
@@ -96,7 +97,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
-            string query = "SELECT Contrasenia FROM Usuarios WHERE Email = @Email";
+            string query = "SELECT Contrasenia FROM Usuarios WHERE Email = @Email AND Estado = 1";
 
             try
             {

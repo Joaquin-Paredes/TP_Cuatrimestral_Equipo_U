@@ -172,7 +172,12 @@
 
             <asp:Button ID="btnCrearCuenta" runat="server"
                 Text="Crear Cuenta"
-                CssClass="btn-register" />
+                CssClass="btn-register"
+                OnClick="btnCrearCuenta_Click" />
+
+            <div style="margin-top: 12px; min-height: 20px; text-align: center;">
+                <asp:Label ID="lblMensaje" runat="server" Font-Bold="true"></asp:Label>
+            </div>
 
             <div class="login-link">
                 ¿Ya tenés una cuenta?
@@ -181,8 +186,6 @@
                     Text="Iniciar sesión">
                 </asp:HyperLink>
             </div>
-
-        </div>
 
     </form>
 </body>

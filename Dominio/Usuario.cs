@@ -9,6 +9,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Dominio
     {
         public int Id { get; set; }
         public string NombreUsuario { get; set; }
+        public string Email { get; set; }
         public string Contrasenia { get; set; }
         public bool EsAdmin { get; set; }
     }

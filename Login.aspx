@@ -119,11 +119,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Correo Electrónico</label>
+                    <label>Correo Electrónico o Usuario</label>
                     <asp:TextBox ID="txtEmail" runat="server"
                         CssClass="form-control"
-                        TextMode="Email"
-                        placeholder="Ingrese su correo electrónico">
+                        placeholder="Ingrese su correo o nombre de usuario">
                     </asp:TextBox>
                 </div>
 

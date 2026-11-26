@@ -14,24 +14,24 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
         protected void btnIniciarSesion_Click(object sender, EventArgs e)
         {
-            string correo = txtEmail.Text.Trim();
+            string usuarioIngresado = txtEmail.Text.Trim();
             string contrasenia = txtContrasena.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasenia))
+            if (string.IsNullOrWhiteSpace(usuarioIngresado) || string.IsNullOrWhiteSpace(contrasenia))
             {
-                lblMensaje.Text = "Completá el correo electrónico y la contraseña.";
+                lblMensaje.Text = "Completá el usuario o correo y la contraseña.";
                 return;
             }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
-            string query = "SELECT Id, NombreUsuario, Email, Contrasenia, EsAdmin FROM Usuarios WHERE Email = @Email AND Contrasenia = @Contrasenia AND Estado = 1";
+            string query = "SELECT Id, NombreUsuario, Contrasenia, EsAdmin FROM Usuarios WHERE (Email = @Usuario OR NombreUsuario = @Usuario) AND Contrasenia = @Contrasenia AND Estado = 1";
 
             try
             {
                 using (SqlConnection conn = new SqlConnection(connString))
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Email", correo);
+                    cmd.Parameters.AddWithValue("@Usuario", usuarioIngresado);
                     cmd.Parameters.AddWithValue("@Contrasenia", contrasenia);
 
                     conn.Open();
@@ -42,7 +42,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                             Usuario usuarioLogueado = new Usuario();
                             usuarioLogueado.Id = Convert.ToInt32(reader["Id"]);
                             usuarioLogueado.NombreUsuario = reader["NombreUsuario"].ToString();
-                            usuarioLogueado.Email = reader["Email"].ToString();
                             usuarioLogueado.Contrasenia = reader["Contrasenia"].ToString();
                             usuarioLogueado.EsAdmin = false;
 
@@ -57,7 +56,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         }
                         else
                         {
-                            lblMensaje.Text = "Correo o contraseña incorrectos.";
+                            lblMensaje.Text = "Usuario, correo o contraseña incorrectos.";
                         }
                     }
                 }
@@ -97,7 +96,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
-            string query = "SELECT Contrasenia FROM Usuarios WHERE Email = @Email AND Estado = 1";
+            string query = "SELECT Contrasenia FROM Usuarios WHERE Email = @Email";
 
             try
             {

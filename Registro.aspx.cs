@@ -15,6 +15,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         {
 
         }
+
         protected void btnCrearCuenta_Click(object sender, EventArgs e)
         {
             string correo = txtEmail.Text.Trim();
@@ -44,16 +45,17 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 {
                     conn.Open();
 
-                    string checkQuery = "SELECT COUNT(1) FROM Usuarios WHERE Email = @Email";
+                    string checkQuery = "SELECT COUNT(1) FROM Usuarios WHERE Email = @Email OR NombreUsuario = @NombreUsuario";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                     {
                         checkCmd.Parameters.AddWithValue("@Email", correo);
+                        checkCmd.Parameters.AddWithValue("@NombreUsuario", nombreUsuario);
                         int existe = Convert.ToInt32(checkCmd.ExecuteScalar());
 
                         if (existe > 0)
                         {
                             lblMensaje.ForeColor = System.Drawing.Color.Red;
-                            lblMensaje.Text = "Ya existe una cuenta registrada con ese correo.";
+                            lblMensaje.Text = "Ya existe una cuenta registrada con ese correo o nombre de usuario.";
                             return;
                         }
                     }
@@ -70,6 +72,13 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
                 lblMensaje.ForeColor = System.Drawing.Color.Green;
                 lblMensaje.Text = "Cuenta creada correctamente. Ya podés iniciar sesión.";
+
+                txtNombre.Text = "";
+                txtApellido.Text = "";
+                txtEmail.Text = "";
+                txtUsuario.Text = "";
+                txtContrasena.Text = "";
+                txtConfirmarContrasena.Text = "";
             }
             catch (Exception ex)
             {
@@ -77,6 +86,5 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 lblMensaje.Text = "Error al registrar usuario: " + ex.Message;
             }
         }
-
     }
 }

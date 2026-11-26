@@ -80,6 +80,12 @@
     </li>
 
 </ul>
+                    <div class="d-flex align-items-center gap-2 text-white">
+                        <asp:Label ID="lblUsuarioLogueado" runat="server" CssClass="fw-semibold"></asp:Label>
+                        <asp:Label ID="lblRolUsuario" runat="server" CssClass="badge bg-secondary"></asp:Label>
+                        <asp:LinkButton ID="btnCerrarSesion" runat="server" CssClass="btn btn-outline-light btn-sm ms-2" OnClick="btnCerrarSesion_Click">Cerrar sesión</asp:LinkButton>
+                    </div>
+
                 </div>
             </div>
         </nav>

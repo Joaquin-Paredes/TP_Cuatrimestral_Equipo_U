@@ -51,7 +51,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                             }
 
                             Session["Usuario"] = usuarioLogueado;
-                            Response.Redirect("~/Default.aspx", false);
+                            Response.Redirect("~/Ventas.aspx", false);
                             Context.ApplicationInstance.CompleteRequest();
                         }
                         else

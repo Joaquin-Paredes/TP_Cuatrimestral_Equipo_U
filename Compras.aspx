@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="Compras" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Compras.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Compras" %>
+﻿<%@ Page Title="Compras" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Compras.aspx.cs" Inherits="Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Compras" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -58,11 +57,12 @@
             </div>
 
             <asp:Label ID="lblMensaje" runat="server" CssClass="fw-bold"></asp:Label>
-            
+
             <div class="mt-2">
                 <asp:Button ID="btnRegistrarCompra" runat="server" Text="Registrar Compra" CssClass="btn btn-primary" OnClick="btnRegistrarCompra_Click" />
-                <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" />
-                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" />
+                <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" OnClick="btnModificar_Click" />
+                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnEliminar_Click" />
+                <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success" OnClick="btnReactivar_Click" />
                 <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
             </div>
 
@@ -71,14 +71,21 @@
         <h4>Listado de Compras</h4>
 
         <div class="mb-3">
-    <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
-        ClientIDMode="Static"
-        CssClass="form-control"
-        placeholder="Buscar por proveedor o producto..."
-        AutoPostBack="true"
-        OnTextChanged="txtBuscarNombreDinamico_TextChanged"
-        onkeydown="guardarScroll()" />
-</div>
+            <asp:TextBox ID="txtBuscarNombreDinamico" runat="server"
+                ClientIDMode="Static"
+                CssClass="form-control"
+                placeholder="Buscar por proveedor o producto..."
+                AutoPostBack="true"
+                OnTextChanged="txtBuscarNombreDinamico_TextChanged"
+                onkeydown="guardarScroll()" />
+        </div>
+
+        <div class="mb-3">
+            <asp:CheckBox ID="chkMostrarEliminadas" runat="server"
+                Text=" Mostrar compras eliminadas"
+                AutoPostBack="true"
+                OnCheckedChanged="chkMostrarEliminadas_CheckedChanged" />
+        </div>
 
         <asp:GridView ID="dgvCompras" runat="server"
             CssClass="table table-striped table-bordered"
@@ -90,15 +97,16 @@
             <Columns>
                 <asp:CommandField ShowSelectButton="True" SelectText="Ver detalle" HeaderText="Acción" ControlStyle-CssClass="btn btn-sm btn-outline-primary" />
                 <asp:BoundField DataField="NumeroCompra" HeaderText="N° Compra" />
-                <asp:BoundField DataField="Fecha" HeaderText="Fecha" />
+                <asp:BoundField DataField="Fecha" HeaderText="Fecha" DataFormatString="{0:dd/MM/yyyy}" />
                 <asp:BoundField DataField="ProveedorNombre" HeaderText="Proveedor" />
                 <asp:BoundField DataField="ProductoNombre" HeaderText="Producto" />
                 <asp:BoundField DataField="Cantidad" HeaderText="Cantidad" />
-                <asp:BoundField DataField="PrecioUnitario" HeaderText="Precio Unitario" />
-                <asp:BoundField DataField="Total" HeaderText="Total" />
+                <asp:BoundField DataField="PrecioUnitario" HeaderText="Precio Unitario" DataFormatString="${0:N2}" />
+                <asp:BoundField DataField="Total" HeaderText="Total" DataFormatString="${0:N2}" />
             </Columns>
 
         </asp:GridView>
+
         <asp:Panel ID="pnlDetalleCompra" runat="server" Visible="false" CssClass="card p-4 mt-4">
             <h4>Detalle de Compra</h4>
             <hr />
@@ -115,17 +123,17 @@
     </main>
 
     <script>
-    function guardarScroll() {
-        sessionStorage.setItem("scrollCompras", window.scrollY);
-    }
+function guardarScroll() {
+    sessionStorage.setItem("scrollCompras", window.scrollY);
+}
 
-    window.addEventListener("load", function () {
-        const pos = sessionStorage.getItem("scrollCompras");
-        if (pos !== null) {
-            window.scrollTo(0, parseInt(pos, 10));
-            sessionStorage.removeItem("scrollCompras");
-        }
-    });
+window.addEventListener("load", function () {
+    const pos = sessionStorage.getItem("scrollCompras");
+    if (pos !== null) {
+        window.scrollTo(0, parseInt(pos, 10));
+        sessionStorage.removeItem("scrollCompras");
+    }
+});
 </script>
 
 </asp:Content>

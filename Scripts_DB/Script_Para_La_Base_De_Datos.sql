@@ -75,6 +75,26 @@ CREATE TABLE DetalleVenta (
 );
 GO
 
+CREATE TABLE Compras (
+    NumeroCompra VARCHAR(20) NOT NULL PRIMARY KEY,
+    Fecha DATE NOT NULL,
+    Proveedor VARCHAR(100) NOT NULL,
+    Total DECIMAL(18,2) NOT NULL,
+    Estado BIT DEFAULT 1
+);
+GO
+
+CREATE TABLE DetalleCompra (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    NumeroCompra VARCHAR(20) NOT NULL,
+    Producto VARCHAR(100) NOT NULL,
+    Cantidad INT NOT NULL,
+    PrecioUnitario DECIMAL(18,2) NOT NULL,
+    Subtotal DECIMAL(18,2) NOT NULL,
+    FOREIGN KEY (NumeroCompra) REFERENCES Compras(NumeroCompra)
+);
+GO
+
 CREATE TABLE Usuarios (
     Id INT PRIMARY KEY IDENTITY(1,1),
     NombreUsuario VARCHAR(100) NOT NULL,

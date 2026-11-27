@@ -57,11 +57,13 @@
 
             </div>
 
+            <asp:Label ID="lblMensaje" runat="server" CssClass="fw-bold"></asp:Label>
+            
             <div class="mt-2">
-                <button type="button" class="btn btn-primary">Registrar Compra</button>
-                <button type="button" class="btn btn-warning">Modificar</button>
-                <button type="button" class="btn btn-danger">Eliminar</button>
-                <button type="button" class="btn btn-secondary">Limpiar</button>
+                <asp:Button ID="btnRegistrarCompra" runat="server" Text="Registrar Compra" CssClass="btn btn-primary" OnClick="btnRegistrarCompra_Click" />
+                <asp:Button ID="btnModificar" runat="server" Text="Modificar" CssClass="btn btn-warning" />
+                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" />
+                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-secondary" OnClick="btnLimpiar_Click" />
             </div>
 
         </div>

@@ -6,14 +6,50 @@ using System.Configuration;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Gestión_Comercio_TP_Cuatrimestral_Equipo_U.Dominio;
 
 namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Categorias : System.Web.UI.Page
     {
+    
+        private bool EsAdministrador()
+        {
+            Usuario usuario = Session["Usuario"] as Usuario;
+
+            return usuario != null && usuario.EsAdmin;
+        }
+
+       
+        private bool RequiereAdministrador()
+        {
+            if (EsAdministrador())
+                return true;
+
+            Response.Redirect("~/Ventas.aspx", false);
+            Context.ApplicationInstance.CompleteRequest();
+
+            return false;
+        }
+
       
         protected void Page_Load(object sender, EventArgs e)
         {
+            bool esAdmin = EsAdministrador();
+
+           
+            pnlGestionCategoria.Visible = esAdmin;
+
+            
+            chkVerInactivos.Visible = esAdmin;
+
+         
+            CommandField campoSeleccion =
+                dgvCategorias.Columns[3] as CommandField;
+
+            if (campoSeleccion != null)
+                campoSeleccion.ShowSelectButton = esAdmin;
+
             if (!IsPostBack)
             {
                 CargarGrilla();
@@ -23,7 +59,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
       
         private void CargarGrilla()
         {
-            int estado = chkVerInactivos.Checked ? 0 : 1;
+            int estado = EsAdministrador() && chkVerInactivos.Checked ? 0 : 1;
 
             string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
 
@@ -39,7 +75,8 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 SqlCommand cmd = new SqlCommand(query, conn);
 
                 cmd.Parameters.Add("@Estado", SqlDbType.Bit).Value = estado;
-                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 50).Value = txtBuscarNombreDinamico.Text.Trim();
+                cmd.Parameters.Add("@Nombre", SqlDbType.VarChar, 50).Value =
+                    txtBuscarNombreDinamico.Text.Trim();
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
 
@@ -50,15 +87,19 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 dgvCategorias.DataBind();
             }
         }
+
+      
         protected void txtBuscarNombreDinamico_TextChanged(object sender, EventArgs e)
         {
             CargarGrilla();
         }
 
-
+       
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
-            // VALIDAR CAMPOS
+            if (!RequiereAdministrador())
+                return;
+
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text) ||
                 string.IsNullOrWhiteSpace(txtNombreCategoria.Text))
             {
@@ -74,11 +115,11 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 {
                     conn.Open();
 
-                    // COMPROBAR SI EL CODIGO YA EXISTE
+                 
                     string consulta = @"
-                SELECT COUNT(1)
-                FROM dbo.Categorias
-                WHERE Codigo = @Codigo";
+                        SELECT COUNT(1)
+                        FROM dbo.Categorias
+                        WHERE Codigo = @Codigo";
 
                     SqlCommand cmdExiste = new SqlCommand(consulta, conn);
 
@@ -93,12 +134,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                         return;
                     }
 
-                    // INSERTAR CATEGORIA SI EL CODIGO NO EXISTE
+                  
                     string query = @"
-                INSERT INTO dbo.Categorias
-                (Codigo, Nombre, Descripcion, Estado)
-                VALUES
-                (@Codigo, @Nombre, @Desc, 1)";
+                        INSERT INTO dbo.Categorias
+                        (Codigo, Nombre, Descripcion, Estado)
+                        VALUES
+                        (@Codigo, @Nombre, @Desc, 1)";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -133,10 +174,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
-
-
+    
         protected void btnModificar_Click(object sender, EventArgs e)
         {
+            if (!RequiereAdministrador())
+                return;
+
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text) ||
                 string.IsNullOrWhiteSpace(txtNombreCategoria.Text))
             {
@@ -192,9 +235,12 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             CargarGrilla();
         }
 
-     
+      
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
+            if (!RequiereAdministrador())
+                return;
+
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text))
             {
                 MostrarMensaje("Seleccione una categoría para eliminar.", false);
@@ -241,16 +287,22 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             CargarGrilla();
         }
 
-
+      
         protected void chkVerInactivos_CheckedChanged(object sender, EventArgs e)
         {
-            LimpiarCampos(); txtDescripcion.Text = "";
+            if (!RequiereAdministrador())
+                return;
+
+            LimpiarCampos();
             CargarGrilla();
         }
 
      
         protected void btnReactivar_Click(object sender, EventArgs e)
         {
+            if (!RequiereAdministrador())
+                return;
+
             if (string.IsNullOrWhiteSpace(txtCodigoCategoria.Text))
             {
                 MostrarMensaje("Seleccione una categoría inactiva para reactivar.", false);
@@ -299,13 +351,38 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             CargarGrilla();
         }
 
-    
+   
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
+            if (!RequiereAdministrador())
+                return;
+
             LimpiarCampos();
             MostrarMensaje("", true);
         }
 
+   
+        protected void dgvCategorias_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!RequiereAdministrador())
+                return;
+
+            if (dgvCategorias.SelectedRow != null)
+            {
+                txtCodigoCategoria.Text =
+                    HttpUtility.HtmlDecode(dgvCategorias.SelectedRow.Cells[0].Text);
+
+                txtCodigoCategoria.ReadOnly = true;
+
+                txtNombreCategoria.Text =
+                    HttpUtility.HtmlDecode(dgvCategorias.SelectedRow.Cells[1].Text);
+
+                txtDescripcion.Text =
+                    HttpUtility.HtmlDecode(dgvCategorias.SelectedRow.Cells[2].Text);
+            }
+        }
+
+      
         private void LimpiarCampos()
         {
             txtCodigoCategoria.Text = "";
@@ -316,19 +393,6 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             txtBuscarNombreDinamico.Text = "";
 
             dgvCategorias.SelectedIndex = -1;
-        }
-
-      
-        protected void dgvCategorias_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (dgvCategorias.SelectedRow != null)
-            {
-                txtCodigoCategoria.Text = HttpUtility.HtmlDecode(dgvCategorias.SelectedRow.Cells[0].Text);
-                txtCodigoCategoria.ReadOnly = true;
-
-                txtNombreCategoria.Text = HttpUtility.HtmlDecode(dgvCategorias.SelectedRow.Cells[1].Text);
-                txtDescripcion.Text = HttpUtility.HtmlDecode(dgvCategorias.SelectedRow.Cells[2].Text);
-            }
         }
 
        

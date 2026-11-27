@@ -27,6 +27,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
             }
         }
 
+
         private void ConfigurarMenuYPermisos(Usuario usuarioActual)
         {
             bool esAdmin = usuarioActual.EsAdmin;
@@ -44,30 +45,34 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
                 lblRolUsuario.CssClass = "badge bg-info text-dark";
             }
 
-            liProductos.Visible = esAdmin;
-            liMarcas.Visible = esAdmin;
-            liCategorias.Visible = esAdmin;
+           
+            liProductos.Visible = true;
+            liMarcas.Visible = true;
+            liCategorias.Visible = true;
+
+           
             liClientes.Visible = esAdmin;
             liProveedores.Visible = esAdmin;
 
+            
             liVentas.Visible = true;
             liCompras.Visible = true;
 
+          
             if (!esAdmin)
             {
-                string paginaActual = Path.GetFileNameWithoutExtension(Request.AppRelativeCurrentExecutionFilePath).ToLower();
-                if (paginaActual == "productos" ||
-                    paginaActual == "marcas" ||
-                    paginaActual == "categorias" ||
-                    paginaActual == "clientes" ||
-                    paginaActual == "proveedores" ||
-                    paginaActual == "default")
+                string paginaActual = Path.GetFileNameWithoutExtension(
+                    Request.AppRelativeCurrentExecutionFilePath).ToLower();
+
+                if (paginaActual == "clientes" ||
+                    paginaActual == "proveedores")
                 {
                     Response.Redirect("~/Ventas.aspx", false);
                     Context.ApplicationInstance.CompleteRequest();
                 }
             }
         }
+
 
         protected void btnCerrarSesion_Click(object sender, EventArgs e)
         {

@@ -10,7 +10,8 @@
             <asp:CheckBox ID="chkVerInactivos" runat="server" Text=" Mostrar categorías eliminadas" AutoPostBack="true" CssClass="form-check-label fw-bold text-danger" OnCheckedChanged="chkVerInactivos_CheckedChanged" />
         </div>
 
-        <div class="card p-4 mb-4">
+    <asp:Panel ID="pnlGestionCategoria" runat="server"
+    CssClass="card p-4 mb-4">
 
             <h4>Datos de la Categoría</h4>
 
@@ -56,7 +57,7 @@
                <asp:Label ID="lblMensaje" runat="server" CssClass="ms-3 fw-bold"></asp:Label>
             </div>
 
-        </div>
+      </asp:Panel>
 
         <h4>Listado de Categorías</h4>
 

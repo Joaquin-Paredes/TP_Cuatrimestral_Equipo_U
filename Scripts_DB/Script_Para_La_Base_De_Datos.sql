@@ -80,6 +80,7 @@ CREATE TABLE Usuarios (
     NombreUsuario VARCHAR(100) NOT NULL,
     Email VARCHAR(150) NOT NULL UNIQUE,
     Contrasenia VARCHAR(255) NOT NULL,
+    CodigoRecuperacion VARCHAR(100) NULL,
     EsAdmin BIT NOT NULL DEFAULT 0,
     Estado BIT DEFAULT 1
 );

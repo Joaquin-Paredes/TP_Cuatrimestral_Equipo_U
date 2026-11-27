@@ -12,7 +12,7 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 {
     public partial class Categorias : System.Web.UI.Page
     {
-    
+     
         private bool EsAdministrador()
         {
             Usuario usuario = Session["Usuario"] as Usuario;

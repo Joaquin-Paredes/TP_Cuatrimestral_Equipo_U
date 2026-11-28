@@ -24,16 +24,34 @@
                         TextMode="Date" CssClass="form-control"></asp:TextBox>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-4 mb-3 position-relative">
                     <label class="form-label">Proveedor</label>
                     <asp:TextBox ID="txtProveedor" runat="server"
-                        CssClass="form-control" placeholder="Ingrese el proveedor"></asp:TextBox>
+                        CssClass="form-control"
+                        placeholder="Escriba o elija un proveedor..."
+                        autocomplete="off"
+                        onfocus="abrirListaProveedores()"
+                        oninput="filtrarListaProveedores()"></asp:TextBox>
+
+                    <div id="listaDesplegableProveedores"
+                         class="list-group position-absolute w-100 shadow bg-white"
+                         style="display: none; max-height: 220px; overflow-y: auto; z-index: 1050;">
+                    </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-4 mb-3 position-relative">
                     <label class="form-label">Producto</label>
                     <asp:TextBox ID="txtProducto" runat="server"
-                        CssClass="form-control" placeholder="Ingrese el producto"></asp:TextBox>
+                        CssClass="form-control"
+                        placeholder="Escriba o elija un producto..."
+                        autocomplete="off"
+                        onfocus="abrirListaProductos()"
+                        oninput="filtrarListaProductos()"></asp:TextBox>
+
+                    <div id="listaDesplegableProductos"
+                         class="list-group position-absolute w-100 shadow bg-white"
+                         style="display: none; max-height: 220px; overflow-y: auto; z-index: 1050;">
+                    </div>
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -134,6 +152,134 @@ window.addEventListener("load", function () {
         sessionStorage.removeItem("scrollCompras");
     }
 });
-</script>
+            let proveedoresDisponibles = [];
+
+            function renderizarProveedores(texto = "") {
+            const lista = document.getElementById("listaDesplegableProveedores");
+            const input = document.getElementById("<%= txtProveedor.ClientID %>");
+    if (!lista || !input) return;
+
+    const q = texto.trim().toLowerCase();
+    lista.innerHTML = "";
+
+            const filtrados = proveedoresDisponibles.filter(p =>
+    (p.nombre && p.nombre.toLowerCase().includes(q)) ||
+    (p.cuit && p.cuit.toLowerCase().includes(q))
+    );
+
+    if (filtrados.length === 0) {
+        lista.innerHTML = `<div class="list-group-item text-muted small">Sin proveedores coincidentes</div>`;
+    return;
+            }
+
+            filtrados.forEach(p => {
+                const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "list-group-item list-group-item-action text-start py-2";
+    btn.innerHTML = `
+    <div class="fw-semibold">${p.nombre}</div>
+    <small class="text-muted">CUIT: ${p.cuit}</small>
+                `;
+                btn.onclick = function () {
+                    input.value = p.nombre;
+                    lista.style.display = "none";
+                };
+                lista.appendChild(btn);
+            });
+        }
+
+        function abrirListaProveedores() {
+            const input = document.getElementById("<%= txtProveedor.ClientID %>");
+            const lista = document.getElementById("listaDesplegableProveedores");
+            if (!input || !lista) return;
+
+            renderizarProveedores(input.value);
+            lista.style.display = "block";
+        }
+
+        function filtrarListaProveedores() {
+            const input = document.getElementById("<%= txtProveedor.ClientID %>");
+            const lista = document.getElementById("listaDesplegableProveedores");
+            if (!input || !lista) return;
+
+            renderizarProveedores(input.value);
+            lista.style.display = "block";
+        }
+
+        document.addEventListener("click", function (e) {
+            const input = document.getElementById("<%= txtProveedor.ClientID %>");
+    const lista = document.getElementById("listaDesplegableProveedores");
+    if (!input || !lista) return;
+
+    if (!input.contains(e.target) && !lista.contains(e.target)) {
+        lista.style.display = "none";
+            }
+        });
+
+        let productosDisponibles = [];
+
+        function renderizarProductos(texto = "") {
+            const lista = document.getElementById("listaDesplegableProductos");
+            const input = document.getElementById("<%= txtProducto.ClientID %>");
+            if (!lista || !input) return;
+
+            const q = texto.trim().toLowerCase();
+            lista.innerHTML = "";
+
+            const filtrados = productosDisponibles.filter(p =>
+                (p.nombre && p.nombre.toLowerCase().includes(q)) ||
+                (p.codigo && p.codigo.toLowerCase().includes(q))
+            );
+
+            if (filtrados.length === 0) {
+                lista.innerHTML = `<div class="list-group-item text-muted small">Sin productos coincidentes</div>`;
+                return;
+            }
+
+            filtrados.forEach(p => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "list-group-item list-group-item-action text-start py-2";
+                btn.innerHTML = `
+                        <div class="fw-semibold">${p.nombre}</div>
+                        <small class="text-muted">${p.codigo ? "Cód: " + p.codigo : ""}</small>
+                    `;
+                btn.onclick = function () {
+                    input.value = p.nombre;
+                    lista.style.display = "none";
+                };
+                lista.appendChild(btn);
+            });
+        }
+
+        function abrirListaProductos() {
+            const input = document.getElementById("<%= txtProducto.ClientID %>");
+                const lista = document.getElementById("listaDesplegableProductos");
+                if (!input || !lista) return;
+
+                renderizarProductos(input.value);
+                lista.style.display = "block";
+            }
+
+            function filtrarListaProductos() {
+                const input = document.getElementById("<%= txtProducto.ClientID %>");
+                const lista = document.getElementById("listaDesplegableProductos");
+                if (!input || !lista) return;
+
+                renderizarProductos(input.value);
+                lista.style.display = "block";
+            }
+
+            document.addEventListener("click", function (e) {
+                const input = document.getElementById("<%= txtProducto.ClientID %>");
+                const lista = document.getElementById("listaDesplegableProductos");
+                if (!input || !lista) return;
+
+                if (!input.contains(e.target) && !lista.contains(e.target)) {
+                    lista.style.display = "none";
+                }
+            });
+    </script>
+
 
 </asp:Content>

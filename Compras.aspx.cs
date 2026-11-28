@@ -71,6 +71,9 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            CargarProveedoresDesplegable();
+            CargarProductosDesplegable();
+
             if (!IsPostBack)
             {
                 txtFechaCompra.Text = DateTime.Now.ToString("yyyy-MM-dd");
@@ -374,6 +377,114 @@ namespace Gestión_Comercio_TP_Cuatrimestral_Equipo_U
         {
             lblMensaje.Text = mensaje;
             lblMensaje.CssClass = correcto ? "fw-bold text-success" : "fw-bold text-danger";
+        }
+        private class ProveedorItem
+        {
+            public int Id { get; set; }
+            public string Nombre { get; set; }
+            public string Cuit { get; set; }
+        }
+
+        private List<ProveedorItem> ObtenerProveedores()
+        {
+            List<ProveedorItem> lista = new List<ProveedorItem>();
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = "SELECT RazonSocial, CUIT FROM Proveedores WHERE Estado = 1 ORDER BY RazonSocial ASC";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        int id = 1;
+                        while (reader.Read())
+                        {
+                            lista.Add(new ProveedorItem
+                            {
+                                Id = id++,
+                                Nombre = reader["RazonSocial"].ToString(),
+                                Cuit = reader["CUIT"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return lista;
+        }
+
+        private void CargarProveedoresDesplegable()
+        {
+            var proveedores = ObtenerProveedores();
+
+            var itemsJson = proveedores.Select(p =>
+                $"{{ id: {p.Id}, nombre: \"{EscapeJs(p.Nombre)}\", cuit: \"{EscapeJs(p.Cuit)}\" }}"
+            );
+
+            string script = $"proveedoresDisponibles = [{string.Join(", ", itemsJson)}];";
+            ScriptManager.RegisterStartupScript(this, GetType(), "CargarProveedoresJS", script, true);
+        }
+
+        private string EscapeJs(string texto)
+        {
+            if (string.IsNullOrEmpty(texto)) return "";
+            return texto.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "");
+        }
+
+        private class ProductoItem
+        {
+            public int Id { get; set; }
+            public string Nombre { get; set; }
+            public string Codigo { get; set; }
+        }
+
+        private List<ProductoItem> ObtenerProductos()
+        {
+            List<ProductoItem> lista = new List<ProductoItem>();
+            string connString = ConfigurationManager.ConnectionStrings["ConexionDB"].ConnectionString;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connString))
+                {
+                    conn.Open();
+                    string query = "SELECT Id, Codigo, Nombre FROM Productos WHERE Estado = 1 ORDER BY Nombre ASC";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new ProductoItem
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Codigo = reader["Codigo"].ToString(),
+                                Nombre = reader["Nombre"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return lista;
+        }
+
+        private void CargarProductosDesplegable()
+        {
+            var productos = ObtenerProductos();
+
+            var itemsJson = productos.Select(p =>
+                $"{{ id: {p.Id}, nombre: \"{EscapeJs(p.Nombre)}\", codigo: \"{EscapeJs(p.Codigo)}\" }}"
+            );
+
+            string script = $"productosDisponibles = [{string.Join(", ", itemsJson)}];";
+            ScriptManager.RegisterStartupScript(this, GetType(), "CargarProductosJS", script, true);
         }
     }
 }
